@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trận Chiến Trên Biển - Bảng Virtual</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>TRẬN CHIẾN TRÊN BIỂN</h1>
+            <p>Bảng virtual để theo dõi trò chơi của bạn</p>
+        </header>
+
+        <div class="game-area">
+            <div class="board-container">
+                <h2>Bảng Của Bạn</h2>
+                <div class="grid" id="my-board"></div>
+            </div>
+            <div class="board-container">
+                <h2>Bảng Đối Thủ</h2>
+                <div class="grid" id="opponent-board"></div>
+            </div>
+        </div>
+
+        <div class="info-area">
+            <div class="legend">
+                <h3>Chú giải màu:</h3>
+                <div class="legend-item"><span class="legend-color ship"></span> Tàu của bạn</div>
+                <div class="legend-item"><span class="legend-color my-ship-hit"></span> Tàu bị bắn trúng</div>
+                <div class="legend-item"><span class="legend-color opponent-hit"></span> Bạn bắn trúng</div>
+                <div class="legend-item"><span class="legend-color miss"></span> Bắn trượt</div>
+            </div>
+    
+            <!-- KHU VỰC GHI CHÚ PHÍM TẮT MỚI -->
+            <div class="hotkey-guide">
+                <h3>Hướng dẫn phím tắt (Di chuột vào ô và bấm):</h3>
+                <div class="guide-columns">
+                    <div class="guide-column">
+                        <h4>Trên Bảng Của Bạn:</h4>
+                        <p><code>1</code> : Đặt/Xóa Tàu</p>
+                        <p><code>2</code> : Đánh dấu Tàu bị bắn trúng</p>
+                        <p><code>3</code> : Đánh dấu Đối thủ bắn trượt</p>
+                        <p><code>0</code> / <code>C</code> : Xóa ô</p>
+                    </div>
+                    <div class="guide-column">
+                        <h4>Trên Bảng Đối Thủ:</h4>
+                        <p><code>1</code> : Đánh dấu Bắn Trúng</p>
+                        <p><code>2</code> : Đánh dấu Bắn Trượt</p>
+                        <p><code>0</code> / <code>C</code> : Xóa ô</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button id="reset-button">Chơi Lại</button>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
