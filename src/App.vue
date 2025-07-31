@@ -7,8 +7,14 @@
     />
     
     <!-- Game Page -->
-    <GamePage 
+    <VirtualGamePage 
       v-if="currentPage === 'game'"
+    />
+    
+    <!-- AI Game Page -->
+    <AIGamePage 
+      v-if="currentPage === 'ai-game'"
+      @page-changed="handlePageChange"
     />
     
     <!-- Tutorial Page -->
@@ -28,7 +34,8 @@
 
 <script>
 import Navigation from './components/Navigation.vue'
-import GamePage from './views/GamePage.vue'
+import VirtualGamePage from './views/VirtualGamePage.vue'
+import AIGamePage from './views/AIGamePage.vue'
 import TutorialPage from './views/TutorialPage.vue'
 import AboutPage from './views/AboutPage.vue'
 import MessageContainer from './components/MessageContainer.vue'
@@ -37,7 +44,8 @@ export default {
   name: 'App',
   components: {
     Navigation,
-    GamePage,
+    VirtualGamePage,
+    AIGamePage,
     TutorialPage,
     AboutPage,
     MessageContainer

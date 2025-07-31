@@ -1,5 +1,5 @@
 <template>
-  <div class="game-board" :class="boardType">
+    <div class="game-board" :class="[boardType, { disabled }]">
     <!-- Grid Labels -->
     <div class="grid-labels">
       <div class="corner-label"></div>
@@ -36,7 +36,8 @@
               'miss': cell.miss,
               'highlight': cell.highlight,
               'preview': cell.preview,
-              'invalid-preview': cell.invalidPreview
+              'invalid-preview': cell.invalidPreview,
+              'disabled': disabled
             }
           ]"
           :data-row="cell.row"
@@ -75,6 +76,14 @@ export default {
     placedShips: {
       type: Array,
       default: () => []
+    },
+    gameBoard: {
+      type: Object,
+      default: () => ({})
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['cell-click', 'cell-hover', 'cell-leave'],
@@ -95,6 +104,12 @@ export default {
       deep: true,
       handler() {
         this.updateShipDisplay()
+      }
+    },
+    gameBoard: {
+      deep: true,
+      handler() {
+        this.updateFromGameBoard()
       }
     },
     // Watch for changes in isHorizontal and update preview
@@ -163,6 +178,7 @@ export default {
     },
     
     handleCellClick(cell) {
+      if (this.disabled) return
       this.$emit('cell-click', { cell, boardType: this.boardType })
     },
     
@@ -301,6 +317,26 @@ export default {
       this.clearPreview()
       if (this.hoveredCell && this.selectedShipSize) {
         this.highlightShipPlacement(this.hoveredCell)
+      }
+    },
+    
+    // Update cells from game board state
+    updateFromGameBoard() {
+      if (!this.gameBoard || Object.keys(this.gameBoard).length === 0) return
+      
+      for (let row = 1; row <= this.gridSize; row++) {
+        for (let col = 1; col <= this.gridSize; col++) {
+          if (this.gameBoard[row] && this.gameBoard[row][col]) {
+            const gameCell = this.gameBoard[row][col]
+            const cell = this.getCell(row, col)
+            
+            if (cell) {
+              cell.ship = gameCell.hasShip || false
+              cell.hit = gameCell.isHit || false
+              cell.miss = gameCell.isMiss || false
+            }
+          }
+        }
       }
     }
   }
@@ -449,6 +485,16 @@ export default {
 .cell.highlight {
   background: rgba(255, 193, 7, 0.3);
   border-color: var(--warning-color);
+}
+
+.game-board.disabled .cell {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.game-board.disabled .cell:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.9);
 }
 
 /* Responsive design */

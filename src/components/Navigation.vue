@@ -7,7 +7,13 @@
           :class="['nav-btn', { active: currentPage === 'game' }]"
           @click="changePage('game')"
         >
-          Chơi Game
+          Bảng Virtual
+        </button>
+        <button 
+          :class="['nav-btn', { active: currentPage === 'ai-game' }]"
+          @click="changePage('ai-game')"
+        >
+          Chơi với AI
         </button>
         <button 
           :class="['nav-btn', { active: currentPage === 'tutorial' }]"
