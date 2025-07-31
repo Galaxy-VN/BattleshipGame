@@ -168,6 +168,15 @@ export class GameEngine {
       this.gameStats.humanHits++
       
       const sunkShip = this.checkShipSunk(row, col, this.aiBoard, this.aiShips)
+      
+      // Important: Notify AI about human's attack results
+      // This helps AI understand when its ships are sunk and update strategy accordingly
+      if (sunkShip) {
+        const sunkShipCells = this.getShipCells(sunkShip)
+        // Inform AI that one of its ships was sunk by human
+        this.ai.shipSunk(sunkShipCells)
+      }
+      
       let result = {
         success: true,
         isHit: true,
@@ -225,12 +234,12 @@ export class GameEngine {
       // AI hit!
       cell.isHit = true
       this.gameStats.aiHits++
-      this.ai.processResult(move.row, move.col, true)
       
       const sunkShip = this.checkShipSunk(move.row, move.col, this.humanBoard, this.humanShips)
-      if (sunkShip) {
-        this.ai.shipSunk(this.getShipCells(sunkShip))
-      }
+      const sunkShipCells = sunkShip ? this.getShipCells(sunkShip) : null
+      
+      // Inform AI with complete information
+      this.ai.processResult(move.row, move.col, true, !!sunkShip, sunkShipCells)
 
       let result = {
         success: true,

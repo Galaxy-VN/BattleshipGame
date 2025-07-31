@@ -114,7 +114,7 @@
       <!-- Information Area -->
       <div class="info-area">
         <div class="legend">
-          <h3>🎨 Chú giải màu:</h3>
+          <h3>Chú giải màu:</h3>
           <div class="legend-item">
             <span class="legend-color ship"></span> Tàu của bạn
           </div>
@@ -130,16 +130,16 @@
         </div>
 
         <div class="hotkey-guide">
-          <h3>⌨️ Hướng dẫn phím tắt (Di chuột vào ô và bấm):</h3>
+          <h3>Hướng dẫn phím tắt (Di chuột vào ô và bấm):</h3>
           <div class="guide-columns">
             <div class="guide-column">
-              <h4>🚢 Trên Bảng Của Bạn (Chế độ đặt tàu):</h4>
+              <h4>Trên Bảng Của Bạn (Chế độ đặt tàu):</h4>
               <p><code>1</code> : Đặt/Xóa Tàu</p>
               <p><code>0</code> / <code>C</code> : Xóa ô</p>
               <p><code>R</code> : Xoay hướng đặt tàu</p>
             </div>
             <div class="guide-column">
-              <h4>🎯 Trên Bảng AI (Khi chơi):</h4>
+              <h4>Trên Bảng AI (Khi chơi):</h4>
               <p><code>Click</code> : Bắn vào ô</p>
               <p><code>Space</code> : Đặt tàu tự động</p>
               <p><code>Enter</code> : Bắt đầu game</p>
@@ -882,9 +882,17 @@ header p {
   flex-wrap: wrap;
   margin: 30px 0;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.98), 
+    rgba(248, 249, 250, 0.95),
+    rgba(255, 255, 255, 0.92)
+  );
   border-radius: 12px;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
+  border: 2px solid rgba(13, 71, 161, 0.2);
+  box-shadow: 
+    0 6px 20px rgba(13, 71, 161, 0.15),
+    inset 0 2px 6px rgba(255, 255, 255, 0.8);
 }
 
 .action-btn {
@@ -1088,16 +1096,16 @@ header p {
   margin: 30px 0;
   padding: 30px;
   background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.2), 
-    rgba(240, 248, 255, 0.15),
-    rgba(225, 245, 255, 0.1)
+    rgba(255, 255, 255, 0.98), 
+    rgba(248, 249, 250, 0.95),
+    rgba(255, 255, 255, 0.92)
   );
   border-radius: 20px;
-  backdrop-filter: blur(15px);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
+  border: 2px solid rgba(13, 71, 161, 0.2);
   box-shadow: 
-    0 8px 32px rgba(13, 71, 161, 0.1),
-    inset 0 2px 10px rgba(255, 255, 255, 0.2);
+    0 8px 32px rgba(13, 71, 161, 0.15),
+    inset 0 2px 10px rgba(255, 255, 255, 0.8);
   position: relative;
   overflow: hidden;
 }
@@ -1110,8 +1118,8 @@ header p {
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 20% 80%, rgba(13, 71, 161, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(25, 118, 210, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 20% 80%, rgba(13, 71, 161, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(25, 118, 210, 0.05) 0%, transparent 50%);
   z-index: -1;
 }
 
@@ -1139,12 +1147,12 @@ header p {
 
 .difficulty-btn {
   background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.8), 
-    rgba(240, 248, 255, 0.7),
-    rgba(225, 245, 255, 0.6)
+    rgba(255, 255, 255, 0.95), 
+    rgba(248, 249, 250, 0.9),
+    rgba(240, 248, 255, 0.85)
   );
   color: var(--primary-color);
-  border: 2px solid rgba(13, 71, 161, 0.4);
+  border: 2px solid rgba(13, 71, 161, 0.6);
   padding: 14px 22px;
   border-radius: 30px;
   cursor: pointer;
@@ -1153,11 +1161,11 @@ header p {
   font-size: 1em;
   text-align: center;
   box-shadow: 
-    0 4px 15px rgba(13, 71, 161, 0.15),
-    inset 0 2px 5px rgba(255, 255, 255, 0.4);
+    0 4px 15px rgba(13, 71, 161, 0.2),
+    inset 0 2px 5px rgba(255, 255, 255, 0.8);
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(3px);
 }
 
 .difficulty-btn::before {
@@ -1230,17 +1238,17 @@ header p {
   margin: 0;
   padding: 15px 25px;
   background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.7), 
-    rgba(248, 249, 250, 0.6),
-    rgba(240, 248, 255, 0.5)
+    rgba(255, 255, 255, 0.95), 
+    rgba(248, 249, 250, 0.9),
+    rgba(255, 255, 255, 0.88)
   );
   border-radius: 15px;
   box-shadow: 
-    0 4px 15px rgba(13, 71, 161, 0.1),
-    inset 0 2px 5px rgba(255, 255, 255, 0.4);
-  border-left: 4px solid rgba(13, 71, 161, 0.6);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+    0 4px 15px rgba(13, 71, 161, 0.15),
+    inset 0 2px 5px rgba(255, 255, 255, 0.9);
+  border-left: 4px solid rgba(13, 71, 161, 0.8);
+  backdrop-filter: blur(3px);
+  border: 1px solid rgba(13, 71, 161, 0.2);
 }
 
 /* Information Area */
@@ -1248,11 +1256,15 @@ header p {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 30px;
-  margin: 40px 0;
-  padding: 30px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  backdrop-filter: blur(10px);
+  margin: 30px 0;
+}
+
+.legend,
+.hotkey-guide {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .legend h3,
@@ -1291,6 +1303,31 @@ header p {
 
 .legend-color.miss {
   background: var(--miss-color);
+}
+
+.guide-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.guide-column h4 {
+  color: var(--secondary-color);
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.guide-column p {
+  margin-bottom: 5px;
+  font-size: 0.9em;
+}
+
+.guide-column code {
+  background: var(--background-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  color: var(--primary-color);
 }
 
 .guide-columns {
@@ -1430,33 +1467,14 @@ header p {
   to { transform: rotate(360deg); }
 }
 
-/* Responsive Design */
+/* Responsive design */
 @media (max-width: 1024px) {
   .game-area {
     gap: 20px;
   }
   
-  .status-info {
+  .info-area {
     gap: 20px;
-  }
-  
-  .game-stats {
-    gap: 15px;
-  }
-  
-  .difficulty-selector {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  
-  .difficulty-section {
-    padding: 20px;
-    margin: 20px 0;
-  }
-  
-  .game-controls {
-    padding: 20px;
-    gap: 15px;
   }
 }
 
@@ -1469,124 +1487,23 @@ header p {
     font-size: 2em;
   }
   
+  header p {
+    font-size: 1em;
+  }
+  
   .game-area {
     grid-template-columns: 1fr;
     gap: 30px;
   }
   
-  .game-controls {
-    flex-direction: column;
-    padding: 15px;
-    gap: 12px;
-  }
-  
-  .game-btn, .difficulty-btn {
-    width: 100%;
-    padding: 12px 20px;
-    font-size: 1em;
-  }
-  
-  .difficulty-section {
-    padding: 15px;
-    margin: 15px 0;
-  }
-  
-  .difficulty-description p {
-    padding: 12px 15px;
-    font-size: 0.95em;
-  }
-  
-  .status-badge, .player-badge {
-    padding: 8px 12px;
-    font-size: 0.9em;
-  }
-  
-  .status-overlay {
-    bottom: 10px;
-    left: 10px;
-    max-width: 260px;
-    min-width: 240px;
-    padding: 12px;
-  }
-  
-  .status-header h4 {
-    font-size: 1em;
-  }
-  
-  .toggle-stats {
-    width: 24px;
-    height: 24px;
-    font-size: 0.8em;
-  }
-  
-  .stat-item-overlay {
-    padding: 6px;
-  }
-  
-  .stat-icon {
-    font-size: 1em;
-    width: 20px;
-  }
-  
-  .game-status {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-  
-  .status-info {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    width: 100%;
-  }
-  
-  .game-stats {
-    width: 100%;
-    justify-content: space-around;
-  }
-  
   .info-area {
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 20px;
-  }
-  
-  .difficulty-section {
-    padding: 20px;
-  }
-  
-  .difficulty-selector {
-    grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 15px;
   }
   
   .guide-columns {
     grid-template-columns: 1fr;
     gap: 15px;
-  }
-  
-  .setup-actions,
-  .game-controls {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 15px;
-  }
-  
-  .action-btn,
-  .game-btn {
-    min-width: 140px;
-    flex: 1;
-    max-width: 200px;
-  }
-  
-  .modal-content {
-    padding: 30px 20px;
-  }
-  
-  .modal-actions {
-    flex-direction: column;
   }
 }
 
@@ -1599,94 +1516,22 @@ header p {
     font-size: 1.8em;
   }
   
-  .game-status {
+  .legend,
+  .hotkey-guide {
     padding: 15px;
   }
   
-  .setup-actions {
-    padding: 15px;
-    gap: 10px;
-  }
-  
-  .difficulty-section {
-    padding: 15px;
-    margin: 20px 0;
-  }
-  
-  .difficulty-section h3 {
+  .legend h3,
+  .hotkey-guide h3 {
     font-size: 1.1em;
   }
   
-  .difficulty-btn {
-    padding: 10px 16px;
-    font-size: 0.9em;
+  .guide-column h4 {
+    font-size: 1em;
   }
   
-  .info-area {
-    padding: 15px;
-    gap: 15px;
-  }
-  
-  .action-btn,
-  .game-btn {
-    min-width: 120px;
-    padding: 10px 16px;
-    font-size: 0.9em;
-  }
-  
-  .difficulty-selector {
-    grid-template-columns: 1fr;
-  }
-  
-  .difficulty-btn {
-    padding: 10px;
-    font-size: 0.9em;
-  }
-  
-  .status-overlay {
-    bottom: 5px;
-    left: 5px;
-    max-width: 220px;
-    min-width: 200px;
-    padding: 10px;
-  }
-  
-  .status-header h4 {
-    font-size: 0.9em;
-  }
-  
-  .toggle-stats {
-    width: 22px;
-    height: 22px;
-    font-size: 0.75em;
-  }
-  
-  .status-badge-overlay,
-  .player-badge-overlay {
-    font-size: 0.75em;
-    padding: 4px 8px;
-  }
-  
-  .stat-item-overlay {
-    padding: 5px;
-    gap: 8px;
-  }
-  
-  .stat-icon {
-    font-size: 0.9em;
-    width: 18px;
-  }
-  
-  .stat-label-overlay {
-    font-size: 0.75em;
-  }
-  
-  .stat-value-overlay {
+  .guide-column p {
     font-size: 0.8em;
-  }
-  
-  .accuracy-overlay {
-    font-size: 0.7em;
   }
 }
 </style>
