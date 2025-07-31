@@ -82,10 +82,44 @@ export default {
 </script>
 
 <style>
-/* Keep only essential variables for backward compatibility */
+/* Ocean-themed background */
 :root {
-  --nav-height: 64px; /* Vuetify app bar height */
+  --nav-height: 64px;
 }
 
-/* Remove custom body styling to let Vuetify handle it */
+.v-application {
+  background: linear-gradient(135deg, 
+    #E3F2FD 0%, 
+    #BBDEFB 25%, 
+    #90CAF9 50%, 
+    #64B5F6 75%, 
+    #42A5F5 100%) !important;
+  min-height: 100vh;
+}
+
+/* Enhanced global styling */
+.v-main {
+  background: transparent;
+}
+
+.v-container {
+  max-width: 1400px;
+}
+
+/* Beautiful card hover effects */
+.v-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.v-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+/* Enhanced button styling */
+.v-btn {
+  text-transform: none !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.5px !important;
+}
 </style>

@@ -6,40 +6,91 @@
         <p>Bảng theo dõi để chơi với bạn bè bằng cách đối thoại</p>
       </header>
 
-      <!-- Ship Placement Controls -->
-      <ShipControls
-        :selected-ship-size="selectedShipSize"
-        :selected-ship-name="selectedShipName"
-        :is-horizontal="isHorizontal"
-        :placed-ships="placedShips"
-        @ship-selected="handleShipSelected"
-        @rotate-ship="handleRotateShip"
-        @clear-ships="handleClearShips"
-      />
-
-      <div class="game-area">
-        <div class="board-container">
-          <h2>Bảng Của Bạn</h2>
-          <GameBoard
-            ref="myBoard"
-            board-type="my"
-            :grid-size="gridSize"
-            :selected-ship-size="selectedShipSize"
-            :is-horizontal="isHorizontal"
-            :placed-ships="placedShips"
-            @cell-click="handleCellClick"
-            @cell-hover="handleCellHover"
-            @cell-leave="handleCellLeave"
-          />
+      <div class="main-layout">
+        <!-- Left Sidebar - Ship Controls -->
+        <div class="controls-sidebar">
+          <div class="control-section">
+            <h3>🚢 Đặt Tàu</h3>
+            <div class="orientation-toggle">
+              <button 
+                :class="['orientation-btn', { active: isHorizontal }]"
+                @click="handleSetHorizontal(true)"
+              >
+                ➡️ Ngang
+              </button>
+              <button 
+                :class="['orientation-btn', { active: !isHorizontal }]"
+                @click="handleSetHorizontal(false)"
+              >
+                ⬇️ Dọc
+              </button>
+            </div>
+          </div>
+          
+          <div class="ships-list">
+            <div 
+              v-for="ship in shipTypes" 
+              :key="ship.name"
+              :class="['ship-item-compact', { 
+                'selected': selectedShipName === ship.name,
+                'completed': getPlacedCount(ship) >= ship.count 
+              }]"
+              @click="handleShipSelected(ship)"
+            >
+              <div class="ship-info">
+                <span class="ship-name">{{ ship.name.replace('Tàu ', '') }}</span>
+                <span class="ship-count">{{ getPlacedCount(ship) }}/{{ ship.count }}</span>
+              </div>
+              <div class="ship-visual-compact">
+                <div 
+                  v-for="n in ship.size" 
+                  :key="n" 
+                  class="ship-segment-small"
+                ></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="control-buttons">
+            <button @click="resetGame" class="control-btn reset-btn">
+              🔄 Chơi Lại
+            </button>
+            <button @click="autoPlaceShips" class="control-btn auto-btn">
+              ⚡ Tự Động
+            </button>
+            <button @click="handleClearShips" class="control-btn clear-btn">
+              🗑️ Xóa Tàu
+            </button>
+          </div>
         </div>
-        <div class="board-container">
-          <h2>Bảng Đối Thủ</h2>
-          <GameBoard
-            ref="opponentBoard"
-            board-type="opponent"
-            :grid-size="gridSize"
-            @cell-click="handleCellClick"
-          />
+
+        <!-- Right Area - Game Boards -->
+        <div class="game-area">
+          <div class="board-container">
+            <h2>Bảng Của Bạn</h2>
+            <GameBoard
+              ref="myBoard"
+              board-type="my"
+              :grid-size="gridSize"
+              :selected-ship-size="selectedShipSize"
+              :is-horizontal="isHorizontal"
+              :placed-ships="placedShips"
+              @cell-click="handleCellClick"
+              @cell-hover="handleCellHover"
+              @cell-leave="handleCellLeave"
+            />
+          </div>
+          <div class="board-container">
+            <h2>Bảng Đối Thủ</h2>
+            <GameBoard
+              ref="opponentBoard"
+              board-type="opponent"
+              :grid-size="gridSize"
+              @cell-click="handleCellClick"
+              @cell-hover="handleCellHover"
+              @cell-leave="handleCellLeave"
+            />
+          </div>
         </div>
       </div>
 
@@ -80,28 +131,17 @@
           </div>
         </div>
       </div>
-      
-      <div class="game-buttons">
-        <button @click="resetGame" class="game-btn reset-btn">
-          🔄 Chơi Lại
-        </button>
-        <button @click="autoPlaceShips" class="game-btn auto-btn">
-          ⚡ Đặt Tàu Tự Động
-        </button>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
 import GameBoard from '../components/GameBoard.vue'
-import ShipControls from '../components/ShipControls.vue'
 
 export default {
   name: 'GamePage',
   components: {
-    GameBoard,
-    ShipControls
+    GameBoard
   },
   data() {
     return {
@@ -113,7 +153,7 @@ export default {
       placedShips: [],
       shipTypes: [
         { name: 'Tàu Sân Bay', size: 5, count: 1 },
-        { name: 'Thiết Giáp Hạm', size: 4, count: 1 },
+        { name: 'Tàu Thiết Giáp Hạm', size: 4, count: 1 },
         { name: 'Tàu Tuần Dương', size: 3, count: 1 },
         { name: 'Tàu Ngầm', size: 3, count: 1 },
         { name: 'Tàu Khu Trục', size: 2, count: 1 }
@@ -141,6 +181,15 @@ export default {
     
     handleRotateShip() {
       this.isHorizontal = !this.isHorizontal
+      this.showMessage(
+        `Hướng đặt tàu: ${this.isHorizontal ? 'Ngang' : 'Dọc'}`,
+        'info',
+        1500
+      )
+    },
+    
+    handleSetHorizontal(value) {
+      this.isHorizontal = value
       this.showMessage(
         `Hướng đặt tàu: ${this.isHorizontal ? 'Ngang' : 'Dọc'}`,
         'info',
@@ -261,6 +310,10 @@ export default {
             break
         }
       }
+    },
+    
+    getPlacedCount(shipType) {
+      return this.placedShips.filter(ship => ship.name === shipType.name).length
     },
     
     canPlaceShip(row, col, size, isHorizontal) {
@@ -390,6 +443,9 @@ export default {
 .page {
   min-height: calc(100vh - var(--nav-height));
   padding: 20px;
+  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #2d3748;
 }
 
 .container {
@@ -401,155 +457,416 @@ export default {
 header {
   text-align: center;
   margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  padding: 32px 24px;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+  background-size: 200% 100%;
+  animation: gradientShift 3s ease-in-out infinite;
 }
 
 header h1 {
-  color: var(--primary-color);
-  font-size: 2.5em;
-  margin-bottom: 10px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  color: #1a202c;
+  font-size: 2.8em;
+  margin-bottom: 12px;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+  text-transform: uppercase;
+}
+
+header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 2px;
 }
 
 header p {
-  color: var(--text-color);
+  color: #ffffff;
+  font-size: 1.15em;
+  opacity: 1;
+  font-weight: 600;
+  margin: 0 auto;
+  max-width: 600px;
+  line-height: 1.6;
+  text-align: center !important;
+  display: block;
+  width: 100%;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Main Layout */
+.main-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  margin: 20px 0;
+}
+
+/* Controls Sidebar */
+.controls-sidebar {
+  width: 280px;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+}
+
+.control-section h3 {
+  margin: 0 0 16px 0;
   font-size: 1.2em;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+}
+
+.orientation-toggle {
+  display: flex;
+  gap: 4px;
+  background: #f8fafc;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+}
+
+.orientation-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #64748b;
+  font-family: inherit;
+  text-align: center;
+}
+
+.orientation-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  transform: scale(1.02);
+}
+
+/* Compact Ship List */
+.ships-list {
+  margin-bottom: 20px;
+}
+
+.ship-item-compact {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.ship-item-compact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.ship-item-compact:hover {
+  background: #f8fafc;
+  border-color: #667eea;
+  transform: translateX(4px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+}
+
+.ship-item-compact:hover::before {
+  transform: scaleX(1);
+}
+
+.ship-item-compact.selected {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-color: #667eea;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+  transform: translateX(2px);
+}
+
+.ship-item-compact.selected::before {
+  transform: scaleX(1);
+}
+
+.ship-item-compact.completed {
+  background: linear-gradient(135deg, rgba(81, 207, 102, 0.1) 0%, rgba(64, 192, 87, 0.1) 100%);
+  border-color: #51cf66;
   opacity: 0.8;
 }
 
+.ship-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ship-name {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #374151;
+}
+
+.ship-count {
+  font-size: 0.8em;
+  color: #64748b;
+  font-weight: 500;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.ship-visual-compact {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+}
+
+.ship-segment-small {
+  width: 10px;
+  height: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.ship-item-compact.completed .ship-segment-small {
+  background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+}
+
+.ship-item-compact:hover .ship-segment-small {
+  transform: scale(1.1);
+}
+
+/* Control Buttons */
+.control-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-btn {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.85em;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  color: white;
+  text-align: center;
+}
+
+.reset-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+.reset-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.auto-btn {
+  background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+  box-shadow: 0 2px 8px rgba(81, 207, 102, 0.3);
+}
+
+.auto-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(81, 207, 102, 0.4);
+}
+
+.clear-btn {
+  background: linear-gradient(135deg, #ffd93d 0%, #ff6b35 100%);
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+}
+
+.clear-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+}
+
+/* Game Area */
 .game-area {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  margin: 30px 0;
-  justify-items: center;
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  align-items: flex-start;
 }
 
 .board-container {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 15px;
+  min-width: 0;
 }
 
 .board-container h2 {
-  color: var(--primary-color);
-  font-size: 1.5em;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.4em;
   margin: 0;
   text-align: center;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
+/* Info Area */
 .info-area {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 30px;
-  margin: 30px 0;
+  margin: 40px 0;
 }
 
 .legend,
 .hotkey-guide {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .legend h3,
 .hotkey-guide h3 {
-  color: var(--primary-color);
-  margin-bottom: 15px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 20px;
   text-align: center;
+  font-weight: 700;
+  font-size: 1.2em;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.legend-item:hover {
+  background: #f8fafc;
 }
 
 .legend-color {
-  width: 20px;
-  height: 20px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
   flex-shrink: 0;
-}
-
-.legend-color.ship {
-  background: var(--ship-color);
-}
-
-.legend-color.my-ship-hit {
-  background: var(--my-ship-hit-color);
-}
-
-.legend-color.opponent-hit {
-  background: var(--hit-color);
-}
-
-.legend-color.miss {
-  background: var(--miss-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .guide-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 24px;
 }
 
 .guide-column h4 {
-  color: var(--secondary-color);
-  margin-bottom: 10px;
+  color: #374151;
+  margin-bottom: 12px;
   font-size: 1.1em;
+  font-weight: 700;
 }
 
 .guide-column p {
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   font-size: 0.9em;
+  font-weight: 500;
+  color: #64748b;
 }
 
 .guide-column code {
-  background: var(--background-color);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: bold;
-  color: var(--primary-color);
-}
-
-.game-buttons {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 30px;
-}
-
-.game-btn {
-  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 600;
-  font-size: 1em;
-}
-
-.game-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(13, 71, 161, 0.3);
-}
-
-.auto-btn {
-  background: linear-gradient(135deg, var(--success-color), #2e7d32);
-}
-
-.auto-btn:hover {
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85em;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
 }
 
 /* Responsive design */
 @media (max-width: 1024px) {
+  .container {
+    max-width: 100%;
+    padding: 0 15px;
+  }
+  
+  .main-layout {
+    gap: 20px;
+  }
+  
+  .controls-sidebar {
+    width: 260px;
+  }
+  
   .game-area {
     gap: 20px;
   }
@@ -557,11 +874,68 @@ header p {
   .info-area {
     gap: 20px;
   }
+  
+  header h1 {
+    font-size: 2.2em;
+  }
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 10px;
+    padding: 0 15px;
+  }
+  
+  .page {
+    padding: 15px;
+  }
+  
+  .main-layout {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .controls-sidebar {
+    width: 100%;
+    position: static;
+    order: 2;
+  }
+  
+  .game-area {
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    order: 1;
+  }
+  
+  .board-container {
+    width: 100%;
+    max-width: 480px;
+  }
+  
+  .ships-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .ship-item-compact {
+    margin-bottom: 0;
+  }
+  
+  .control-buttons {
+    flex-direction: row;
+    gap: 8px;
+  }
+  
+  .control-btn {
+    flex: 1;
+    font-size: 0.8em;
+    padding: 8px 12px;
+  }
+  
+  header {
+    padding: 16px;
+    margin-bottom: 20px;
   }
   
   header h1 {
@@ -572,14 +946,10 @@ header p {
     font-size: 1em;
   }
   
-  .game-area {
-    grid-template-columns: 1fr;
-    gap: 30px;
-  }
-  
   .info-area {
     grid-template-columns: 1fr;
-    gap: 15px;
+    gap: 20px;
+    margin: 30px 0;
   }
   
   .guide-columns {
@@ -587,15 +957,9 @@ header p {
     gap: 15px;
   }
   
-  .game-buttons {
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .game-btn {
-    width: 100%;
-    max-width: 200px;
+  .legend,
+  .hotkey-guide {
+    padding: 20px;
   }
 }
 
@@ -604,18 +968,88 @@ header p {
     padding: 10px;
   }
   
+  .container {
+    padding: 0 10px;
+  }
+  
+  .main-layout {
+    gap: 15px;
+  }
+  
+  .controls-sidebar {
+    padding: 16px;
+  }
+  
+  .ships-list {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  
+  .control-buttons {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .control-btn {
+    font-size: 0.8em;
+    padding: 8px 12px;
+  }
+  
+  .ship-item-compact {
+    padding: 10px;
+  }
+  
+  .ship-info {
+    margin-bottom: 6px;
+  }
+  
+  .ship-name {
+    font-size: 0.85em;
+  }
+  
+  .ship-count {
+    font-size: 0.75em;
+  }
+  
+  .control-section h3 {
+    font-size: 1.1em;
+  }
+  
+  .orientation-btn {
+    padding: 6px 10px;
+    font-size: 0.8em;
+  }
+  
+  header {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+  
   header h1 {
     font-size: 1.8em;
   }
   
+  header p {
+    font-size: 0.9em;
+  }
+  
+  .board-container {
+    max-width: 100%;
+  }
+  
+  .board-container h2 {
+    font-size: 1.2em;
+  }
+  
   .legend,
   .hotkey-guide {
-    padding: 15px;
+    padding: 16px;
   }
   
   .legend h3,
   .hotkey-guide h3 {
     font-size: 1.1em;
+    margin-bottom: 15px;
   }
   
   .guide-column h4 {
@@ -623,7 +1057,144 @@ header p {
   }
   
   .guide-column p {
-    font-size: 0.8em;
+    font-size: 0.85em;
   }
+  
+  .legend-item {
+    padding: 6px;
+    margin-bottom: 8px;
+  }
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Apply animations */
+header {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.controls-sidebar {
+  animation: slideInLeft 0.6s ease-out 0.2s both;
+}
+
+.game-area {
+  animation: slideInRight 0.6s ease-out 0.4s both;
+}
+
+.ship-item-compact.selected {
+  animation: pulse 2s infinite;
+}
+
+.control-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.control-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -200px;
+  width: 200px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.control-btn:hover::after {
+  opacity: 1;
+}
+
+/* Enhanced hover effects */
+.ship-item-compact {
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.ship-item-compact:active {
+  transform: translateX(0) scale(0.98);
+}
+
+.control-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+.control-btn:focus,
+.orientation-btn:focus,
+.ship-item-compact:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
 }
 </style>

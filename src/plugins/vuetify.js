@@ -7,22 +7,74 @@ import * as directives from 'vuetify/directives'
 import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 
-// Custom theme for Battleship Game
+// Custom theme for Battleship Game - Beautiful and Consistent
 const battleshipTheme = {
   dark: false,
   colors: {
-    primary: '#1976D2',      // Navy blue
-    secondary: '#FF5722',    // Orange for hits
-    accent: '#4CAF50',       // Green for successful actions
-    error: '#F44336',        // Red for errors/misses
-    warning: '#FF9800',      // Orange for warnings
-    info: '#2196F3',         // Light blue for info
-    success: '#4CAF50',      // Green for success
-    surface: '#FFFFFF',      // White background
-    background: '#F5F5F5',   // Light gray background
-    'ocean-blue': '#0D47A1', // Deep ocean blue
-    'ship-gray': '#607D8B',  // Ship gray
-    'water-light': '#E3F2FD' // Light water blue
+    // Primary colors - Ocean theme
+    primary: '#0277BD',        // Deep Ocean Blue
+    'primary-darken-1': '#01579B',
+    'primary-lighten-1': '#0288D1',
+    
+    // Secondary colors - Sunset/Fire theme  
+    secondary: '#FF6F00',      // Deep Orange
+    'secondary-darken-1': '#E65100',
+    'secondary-lighten-1': '#FF8F00',
+    
+    // Accent colors
+    accent: '#00ACC1',         // Cyan accent
+    
+    // Semantic colors
+    success: '#2E7D32',        // Forest Green
+    warning: '#F57C00',        // Amber
+    error: '#C62828',          // Deep Red
+    info: '#1976D2',           // Blue
+    
+    // Surface colors
+    surface: '#FFFFFF',
+    'surface-variant': '#F5F5F5',
+    background: '#FAFAFA',
+    
+    // Custom game colors
+    'ocean-dark': '#01579B',
+    'ocean-light': '#B3E5FC',
+    'ship-steel': '#455A64',
+    'hit-explosion': '#D32F2F',
+    'miss-splash': '#1976D2',
+    'water-deep': '#0277BD',
+    'water-shallow': '#E1F5FE'
+  }
+}
+
+const darkBattleshipTheme = {
+  dark: true,
+  colors: {
+    primary: '#1E88E5',
+    'primary-darken-1': '#1565C0',
+    'primary-lighten-1': '#42A5F5',
+    
+    secondary: '#FF9800',
+    'secondary-darken-1': '#F57C00',
+    'secondary-lighten-1': '#FFB74D',
+    
+    accent: '#26C6DA',
+    
+    success: '#66BB6A',
+    warning: '#FFA726',
+    error: '#EF5350',
+    info: '#42A5F5',
+    
+    surface: '#1E1E1E',
+    'surface-variant': '#2D2D2D',
+    background: '#121212',
+    
+    'ocean-dark': '#0D47A1',
+    'ocean-light': '#1976D2',
+    'ship-steel': '#78909C',
+    'hit-explosion': '#F44336',
+    'miss-splash': '#2196F3',
+    'water-deep': '#1565C0',
+    'water-shallow': '#1976D2'
   }
 }
 
@@ -30,19 +82,28 @@ export default createVuetify({
   components,
   directives,
   theme: {
-    defaultTheme: 'battleshipTheme',
+    defaultTheme: 'battleshipLight',
     themes: {
-      battleshipTheme,
+      battleshipLight: battleshipTheme,
+      battleshipDark: darkBattleshipTheme,
     }
   },
   defaults: {
     VBtn: {
       elevation: 2,
-      rounded: 'lg'
+      rounded: 'lg',
+      style: 'text-transform: none; font-weight: 500;'
     },
     VCard: {
-      elevation: 3,
+      elevation: 4,
+      rounded: 'xl'
+    },
+    VChip: {
+      elevation: 1,
       rounded: 'lg'
+    },
+    VAppBar: {
+      elevation: 4
     }
   }
 })

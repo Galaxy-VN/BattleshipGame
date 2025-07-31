@@ -1,92 +1,123 @@
 <template>
-  <v-card 
-    class="ship-controls"
-    elevation="3"
-    rounded="lg"
-  >
-    <v-card-title class="text-h6 pb-2">
-      <v-icon left color="primary">mdi-ferry</v-icon>
-      Đặt Tàu Chiến
-    </v-card-title>
+  <div class="glass rounded-2xl p-4 shadow-xl border-primary-200">
+    <!-- Modern Header -->
+    <div class="flex items-center justify-center gap-3 mb-4">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+        <v-icon color="white" size="18">mdi-ferry</v-icon>
+      </div>
+      <h3 class="text-lg font-display font-semibold text-primary-700 tracking-tight">Đặt Tàu Chiến</h3>
+    </div>
     
-    <v-card-text>
-      <!-- Ship Selection Buttons -->
-      <v-row class="ship-buttons mb-4">
-        <v-col 
-          v-for="ship in shipTypes" 
-          :key="ship.name"
-          cols="12"
-          sm="6"
-          md="4"
-        >
-          <v-btn
-            :color="selectedShipName === ship.name ? 'primary' : 'surface'"
-            :variant="selectedShipName === ship.name ? 'elevated' : 'outlined'"
-            :disabled="!canPlaceMoreShips(ship)"
-            :data-size="ship.size" 
-            :data-name="ship.name"
-            @click="selectShip(ship)"
-            block
-            size="large"
-            class="ship-btn"
-          >
-            <div class="text-center">
-              <div class="font-weight-bold">{{ ship.name }}</div>
-              <div class="text-caption">({{ ship.size }} ô)</div>
-              <v-chip 
-                v-if="getShipCount(ship) > 0" 
-                color="accent"
-                size="x-small"
-                class="mt-1"
-              >
-                {{ getShipCount(ship) }}/{{ ship.count }}
-              </v-chip>
-            </div>
-          </v-btn>
-        </v-col>
-      </v-row>
+    <!-- Compact Ship Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-4">
+      <div 
+        v-for="ship in shipTypes" 
+        :key="ship.name"
+        :class="[
+          'ship-card-compact',
+          {
+            'ship-card-selected': selectedShipName === ship.name,
+            'ship-card-disabled': !canPlaceMoreShips(ship)
+          }
+        ]"
+        @click="selectShip(ship)"
+      >
+        <!-- Ship Header -->
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm font-medium text-neutral-800 truncate font-display">{{ ship.name }}</span>
+          <span class="bg-gradient-to-r from-secondary-500 to-secondary-600 text-white text-xs px-2.5 py-1 rounded-full font-semibold min-w-[28px] text-center shadow-sm">{{ ship.size }}</span>
+        </div>
+        
+        <!-- Ship Visual -->
+        <div class="flex justify-center gap-1.5 mb-3">
+          <div 
+            v-for="n in ship.size" 
+            :key="n" 
+            :class="[
+              'ship-segment-mini',
+              {
+                'ship-segment-selected': selectedShipName === ship.name,
+                'ship-segment-completed': !canPlaceMoreShips(ship)
+              }
+            ]"
+          ></div>
+        </div>
+        
+        <!-- Ship Count & Status -->
+        <div class="space-y-2">
+          <div class="text-center">
+            <span :class="[
+              'text-xs px-3 py-1.5 rounded-full font-medium transition-all duration-200',
+              getShipCount(ship) > 0 ? 'bg-success-100 text-success-700 border border-success-400/20' : 'bg-neutral-100 text-neutral-500 border border-neutral-200'
+            ]">
+              {{ getShipCount(ship) }}/{{ ship.count }}
+            </span>
+          </div>
+          
+          <div class="text-center">
+            <span class="text-xs font-medium" :class="{
+              'status-selected': selectedShipName === ship.name,
+              'status-completed': !canPlaceMoreShips(ship),
+              'status-available': selectedShipName !== ship.name && canPlaceMoreShips(ship)
+            }">
+              <span v-if="selectedShipName === ship.name">✓ Đã chọn</span>
+              <span v-else-if="!canPlaceMoreShips(ship)">✅ Hoàn thành</span>
+              <span v-else>○ Sẵn sàng</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
       
-      <!-- Placement Controls -->
-      <v-row class="placement-controls align-center">
-        <v-col cols="12" sm="4">
-          <v-btn
-            @click="rotateShip"
-            color="secondary"
-            variant="outlined"
-            prepend-icon="mdi-rotate-3d-variant"
-            block
+    <!-- Modern Controls -->
+    <div class="glass rounded-xl p-4 border-primary-100">
+      <!-- Orientation Controls -->
+      <div class="mb-4">
+        <div class="text-sm font-medium text-neutral-700 text-center mb-3 font-display">Hướng đặt tàu:</div>
+        <div class="flex gap-2">
+          <button
+            :class="[
+              'orientation-btn',
+              isHorizontal ? 'orientation-btn-active' : 'orientation-btn-inactive'
+            ]"
+            @click="setHorizontal(true)"
           >
-            Xoay (R)
-          </v-btn>
-        </v-col>
+            <v-icon size="16">mdi-arrow-right</v-icon>
+            <span class="text-sm font-medium">Ngang</span>
+          </button>
+          <button
+            :class="[
+              'orientation-btn',
+              !isHorizontal ? 'orientation-btn-active' : 'orientation-btn-inactive'
+            ]"
+            @click="setHorizontal(false)"
+          >
+            <v-icon size="16">mdi-arrow-down</v-icon>
+            <span class="text-sm font-medium">Dọc</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex gap-3">
+        <button
+          @click="rotateShip"
+          class="control-btn-primary flex-1 text-sm flex items-center justify-center gap-2 font-display"
+        >
+          <v-icon size="16">mdi-rotate-3d-variant</v-icon>
+          <span>Xoay (R)</span>
+        </button>
         
-        <v-col cols="12" sm="4">
-          <v-btn
-            @click="clearAllShips"
-            color="error"
-            variant="outlined"
-            prepend-icon="mdi-delete-sweep"
-            block
-          >
-            Xóa Tất Cả
-          </v-btn>
-        </v-col>
-        
-        <v-col cols="12" sm="4">
-          <v-chip
-            :color="isHorizontal ? 'info' : 'warning'"
-            size="large"
-            class="direction-indicator"
-          >
-            <v-icon left>
-              {{ isHorizontal ? 'mdi-arrow-right' : 'mdi-arrow-down' }}
-            </v-icon>
-            {{ isHorizontal ? 'Ngang' : 'Dọc' }}
-          </v-chip>
-        </v-col>
-      </v-row>
-    </v-card-text>
-  </v-card>
+        <button
+          @click="clearAllShips"
+          class="control-btn-danger flex-1 text-sm flex items-center justify-center gap-2 font-display"
+        >
+          <v-icon size="16">mdi-delete-sweep</v-icon>
+          <span>Xóa</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -110,7 +141,7 @@ export default {
       default: () => []
     }
   },
-  emits: ['ship-selected', 'rotate-ship', 'clear-ships'],
+  emits: ['ship-selected', 'rotate-ship', 'set-horizontal', 'clear-ships'],
   data() {
     return {
       shipTypes: [
@@ -141,6 +172,10 @@ export default {
     
     rotateShip() {
       this.$emit('rotate-ship')
+    },
+    
+    setHorizontal(value) {
+      this.$emit('set-horizontal', value)
     },
     
     clearAllShips() {
@@ -253,6 +288,43 @@ export default {
 .direction-indicator span {
   font-weight: bold;
   color: var(--secondary-color);
+}
+
+/* Orientation Button Styles */
+.orientation-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.orientation-btn-active {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+  color: white;
+  border-color: var(--primary-300);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(var(--primary-500-rgb), 0.3);
+}
+
+.orientation-btn-inactive {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--neutral-600);
+  border-color: var(--neutral-200);
+}
+
+.orientation-btn-inactive:hover {
+  background: var(--primary-50);
+  color: var(--primary-600);
+  border-color: var(--primary-200);
+  transform: translateY(-1px);
 }
 
 /* Responsive design */

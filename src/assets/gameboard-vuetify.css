@@ -3,14 +3,6 @@
   background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
 }
 
-.game-board-card.my {
-  border-left: 4px solid var(--v-theme-primary);
-}
-
-.game-board-card.opponent {
-  border-left: 4px solid var(--v-theme-secondary);
-}
-
 .game-board {
   padding: 16px;
   display: flex;
@@ -62,7 +54,7 @@
   grid-template-rows: repeat(10, 30px);
   gap: 2px;
   padding: 4px;
-  background: rgba(var(--v-theme-surface-rgb), 0.8);
+  background: linear-gradient(135deg, #0277BD 0%, #01579B 50%, #004D7A 100%);
   border-radius: 8px;
   border: 2px solid rgba(var(--v-theme-primary-rgb), 0.2);
 }

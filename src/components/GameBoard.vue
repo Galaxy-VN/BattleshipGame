@@ -1,62 +1,65 @@
 <template>
-  <v-card 
-    class="game-board-card"
+  <div 
+    class="gameboard-container bg-white/95 backdrop-blur-md rounded-xl shadow-lg overflow-hidden"
     :class="[boardType, { disabled }]"
-    elevation="3"
-    rounded="lg"
   >
-    <div class="game-board">
-      <!-- Grid Labels -->
-      <div class="grid-labels">
-        <div class="corner-label"></div>
-        <div 
-          v-for="col in gridSize" 
-          :key="`col-${col}`" 
-          class="col-label"
-        >
-          {{ String.fromCharCode(64 + col) }}
-        </div>
-      </div>
-      
-      <!-- Game Grid -->
-      <div class="grid-container">
-        <div class="row-labels">
+    <div class="p-4">
+      <div class="game-board board-with-coordinates">
+        <!-- Grid Labels -->
+        <div class="grid-labels">
+          <div class="corner-label"></div>
           <div 
-            v-for="row in gridSize" 
-            :key="`row-${row}`" 
-            class="row-label"
+            v-for="col in gridSize" 
+            :key="`col-${col}`" 
+            class="col-label coordinate-col"
           >
-            {{ row }}
+            {{ String.fromCharCode(64 + col) }}
           </div>
         </div>
         
-        <div class="grid">
-          <div 
-            v-for="cell in cells" 
-            :key="`${boardType}-${cell.row}-${cell.col}`"
-            :class="[
-              'cell',
-              {
-                'ship': cell.ship,
-                'hit': cell.hit,
-                'miss': cell.miss,
-                'highlight': cell.highlight,
-                'preview': cell.preview,
-                'invalid-preview': cell.invalidPreview,
-                'disabled': disabled
-              }
-            ]"
-            :data-row="cell.row"
-            :data-col="cell.col"
-            @click="handleCellClick(cell)"
-            @mouseenter="handleCellHover(cell)"
-            @mouseleave="handleCellLeave(cell)"
-          >
+        <!-- Game Grid -->
+        <div class="grid-container">
+          <div class="row-labels">
+            <div 
+              v-for="row in gridSize" 
+              :key="`row-${row}`" 
+              class="row-label coordinate-row"
+            >
+              {{ row }}
+            </div>
+          </div>
+          
+          <div class="grid">
+            <div 
+              v-for="cell in cells" 
+              :key="`${boardType}-${cell.row}-${cell.col}`"
+              :class="[
+                'cell',
+                'board-cell',
+                {
+                  'ship': cell.ship,
+                  'hit': cell.hit,
+                  'miss': cell.miss,
+                  'water': !cell.ship && !cell.hit && !cell.miss,
+                  'sunk': cell.sunk,
+                  'highlight': cell.highlight,
+                  'preview': cell.preview,
+                  'invalid-preview': cell.invalidPreview,
+                  'disabled': disabled
+                }
+              ]"
+              :data-row="cell.row"
+              :data-col="cell.col"
+              @click="handleCellClick(cell)"
+              @mouseenter="handleCellHover(cell)"
+              @mouseleave="handleCellLeave(cell)"
+            >
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </v-card>
+  </div>
 </template>
 
 <script>
@@ -355,207 +358,334 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 0.75rem;
 }
 
 .grid-labels {
   display: grid;
-  grid-template-columns: 30px repeat(v-bind(gridSize), 35px);
-  gap: 2px;
-  margin-bottom: 5px;
+  grid-template-columns: 2rem repeat(v-bind(gridSize), 2.5rem);
+  gap: 0.125rem;
+  margin-bottom: 0.5rem;
 }
 
 .corner-label {
-  width: 30px;
-  height: 25px;
+  width: 2rem;
+  height: 2rem;
 }
 
 .col-label {
-  width: 35px;
-  height: 25px;
+  width: 2.5rem;
+  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  color: var(--primary-color);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--primary-700);
+  background: var(--primary-50);
+  border-radius: 0.375rem;
+  border: 1px solid var(--primary-200);
 }
 
 .grid-container {
   display: flex;
-  gap: 5px;
+  gap: 0.5rem;
 }
 
 .row-labels {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
 }
 
 .row-label {
-  width: 30px;
-  height: 35px;
+  width: 2rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  color: var(--primary-color);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--primary-700);
+  background: var(--primary-50);
+  border-radius: 0.375rem;
+  border: 1px solid var(--primary-200);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(v-bind(gridSize), 35px);
-  grid-template-rows: repeat(v-bind(gridSize), 35px);
-  gap: 2px;
-  border: 3px solid var(--primary-color);
-  border-radius: 8px;
-  padding: 5px;
-  background: rgba(255, 255, 255, 0.8);
+  grid-template-columns: repeat(v-bind(gridSize), 2.5rem);
+  grid-template-rows: repeat(v-bind(gridSize), 2.5rem);
+  gap: 0.125rem;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #0277BD 0%, #01579B 50%, #004D7A 100%);
+  position: relative;
+  margin-top: 0;
+}
+
+.row-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
 }
 
 .cell {
-  width: 35px;
-  height: 35px;
-  border: 1px solid var(--cell-border-color);
-  background: rgba(255, 255, 255, 0.9);
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--neutral-300);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 3px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0.375rem;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.cell:hover {
-  background: var(--hover-color);
-  transform: scale(1.05);
+.cell:hover:not(.disabled):not(.ship):not(.hit):not(.miss):not(.preview):not(.invalid-preview) {
+  background: linear-gradient(135deg, var(--primary-100) 0%, var(--secondary-100) 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(var(--primary-500-rgb), 0.3);
+  border-color: var(--primary-400);
+}
+
+.cell.ship:hover:not(.disabled) {
+  background: linear-gradient(135deg, #0288D1 0%, #0277BD 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(2, 119, 189, 0.4);
+  border-color: var(--primary-700);
+}
+
+.cell.hit:hover:not(.disabled) {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+  border-color: #be185d;
+}
+
+.cell.ship.hit:hover:not(.disabled) {
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+  border-color: #ea580c;
+}
+
+.cell.miss:hover:not(.disabled) {
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(100, 116, 139, 0.4);
+  border-color: var(--neutral-600);
 }
 
 .cell.ship {
-  background: var(--ship-color);
-  border-color: #37474f;
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+  border-color: var(--primary-700);
+  color: white;
 }
 
 .cell.ship::after {
-  content: '🚢';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 18px;
+  content: '\2693';
+  font-size: 1.125rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .cell.hit {
-  background: var(--hit-color);
-  border-color: #b71c1c;
+  background: linear-gradient(135deg, #e11d48 0%, #be185d 100%);
+  border-color: #9f1239;
+  animation: hitPulse 0.6s ease-out;
 }
 
 .cell.hit::after {
-  content: '🔥';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 18px;
+  content: '💥';
+  font-size: 1.125rem;
+  animation: explosion 0.8s ease-out;
+  color: white;
+  font-weight: bold;
+  text-shadow: 
+    0 0 4px rgba(255, 255, 255, 1),
+    0 0 8px rgba(255, 255, 255, 0.8),
+    0 0 12px rgba(255, 255, 255, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
 }
 
 .cell.ship.hit {
-  background: var(--my-ship-hit-color);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-color: #c2410c;
 }
 
 .cell.ship.hit::after {
-  content: '💥';
+  content: '\1F525';
+  font-size: 1.125rem;
 }
 
 .cell.miss {
-  background: var(--miss-color);
-  border-color: #ccc;
+  background: linear-gradient(135deg, var(--neutral-400) 0%, var(--neutral-500) 100%);
+  border-color: var(--neutral-600);
 }
 
 .cell.miss::after {
-  content: '●';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #666;
-  font-size: 12px;
+  content: '\2022';
+  font-size: 1rem;
+  opacity: 0.8;
+  color: var(--neutral-200);
 }
 
 .cell.preview {
-  background: rgba(76, 175, 80, 0.3);
-  border-color: var(--success-color);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(22, 163, 74, 0.3) 100%) !important;
+  border-color: var(--success-500) !important;
+  transform: scale(1.02) !important;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4) !important;
+}
+
+.cell.preview:hover {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.5) 0%, rgba(22, 163, 74, 0.5) 100%) !important;
+  border-color: var(--success-600) !important;
+  transform: translateY(-1px) scale(1.05) !important;
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5) !important;
 }
 
 .cell.invalid-preview {
-  background: rgba(244, 67, 54, 0.3);
-  border-color: var(--hit-color);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(220, 38, 38, 0.3) 100%) !important;
+  border-color: #ef4444 !important;
+  transform: scale(1.02) !important;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4) !important;
+}
+
+.cell.invalid-preview:hover {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.5) 0%, rgba(220, 38, 38, 0.5) 100%) !important;
+  border-color: #dc2626 !important;
+  transform: translateY(-1px) scale(1.05) !important;
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5) !important;
 }
 
 .cell.highlight {
-  background: rgba(255, 193, 7, 0.3);
-  border-color: var(--warning-color);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(245, 158, 11, 0.3) 100%);
+  border-color: #f59e0b;
+  transform: scale(1.02);
 }
 
-.game-board.disabled .cell {
+.gameboard-container.disabled .cell {
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-.game-board.disabled .cell:hover {
+.gameboard-container.disabled .cell:hover {
   transform: none;
-  background: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
+  box-shadow: none;
+}
+
+@keyframes hitPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes explosion {
+  0% { transform: scale(0.5) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+  100% { transform: scale(1) rotate(360deg); opacity: 1; }
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
   .grid {
-    grid-template-columns: repeat(v-bind(gridSize), 28px);
-    grid-template-rows: repeat(v-bind(gridSize), 28px);
+    grid-template-columns: repeat(v-bind(gridSize), 2rem);
+    grid-template-rows: repeat(v-bind(gridSize), 2rem);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+  }
+  
+  .row-labels {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
   
   .cell {
-    width: 28px;
-    height: 28px;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.25rem;
   }
   
   .cell::after {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   
   .col-label,
   .row-label {
-    width: 28px;
-    height: 28px;
-    font-size: 0.9em;
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
   }
   
   .grid-labels {
-    grid-template-columns: 25px repeat(v-bind(gridSize), 28px);
+    grid-template-columns: 1.5rem repeat(v-bind(gridSize), 2rem);
+  }
+  
+  .corner-label {
+    width: 1.5rem;
+  }
+  
+  .row-label {
+    width: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .grid {
-    grid-template-columns: repeat(v-bind(gridSize), 24px);
-    grid-template-rows: repeat(v-bind(gridSize), 24px);
+    grid-template-columns: repeat(v-bind(gridSize), 1.75rem);
+    grid-template-rows: repeat(v-bind(gridSize), 1.75rem);
+    padding: 0.375rem;
+    border-radius: 0.375rem;
+  }
+
+  .grid::before {
+    border-radius: 0.375rem;
+  }
+
+  .row-labels {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
   }
   
   .cell {
-    width: 24px;
-    height: 24px;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0.25rem;
   }
   
   .cell::after {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   
   .col-label,
   .row-label {
-    width: 24px;
-    height: 24px;
-    font-size: 0.8em;
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.675rem;
+    border-radius: 0.25rem;
   }
   
   .grid-labels {
-    grid-template-columns: 20px repeat(v-bind(gridSize), 24px);
+    grid-template-columns: 1.25rem repeat(v-bind(gridSize), 1.75rem);
+  }
+  
+  .corner-label {
+    width: 1.25rem;
+  }
+  
+  .row-label {
+    width: 1.25rem;
   }
 }
 </style>
