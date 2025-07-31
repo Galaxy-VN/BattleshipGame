@@ -53,6 +53,27 @@ npm run build
 npm run lint
 ```
 
+## 🚀 Deploy lên GitHub Pages
+
+Project này được deploy tự động lên GitHub Pages thông qua GitHub Actions.
+
+### Cách deploy:
+
+1. **Push code lên GitHub repository**
+2. **GitHub Actions sẽ tự động build và deploy**
+3. **Truy cập ứng dụng tại:**
+   ```
+   https://galaxy-vn.github.io/BattleshipGame/
+   ```
+
+### Cấu hình GitHub Pages (chỉ cần làm 1 lần):
+
+1. Vào repository **Settings** → **Pages**
+2. Chọn **Source**: **GitHub Actions**
+3. Lưu cài đặt
+
+Sau đó, mỗi lần push code lên branch `main`, ứng dụng sẽ được deploy tự động!
+
 ## 🎮 Cách chơi
 
 ### Đặt tàu

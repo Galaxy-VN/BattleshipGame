@@ -1,0 +1,41 @@
+name: Deploy to GitHub Pages
+
+# Trigger deployment khi push lên main branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Cho phép chạy workflow thủ công
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build
+
+    - name: Setup Pages 
+      uses: actions/configure-pages@v4
+
+    - name: Upload artifact 📤
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist'
+
+    - name: Deploy
+      id: deployment
+      uses: actions/deploy-pages@v4
