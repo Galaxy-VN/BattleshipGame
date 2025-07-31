@@ -1,0 +1,168 @@
+/* Mobile responsive improvements for Vuetify Battleship Game */
+
+/* Mobile-first approach for navigation */
+@media (max-width: 600px) {
+  .v-app-bar .v-btn-toggle {
+    display: none !important;
+  }
+  
+  .v-app-bar-title {
+    font-size: 1rem !important;
+  }
+  
+  .v-app-bar {
+    height: 56px !important;
+  }
+}
+
+/* Tablet improvements */
+@media (max-width: 960px) {
+  .v-container {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  
+  .v-card-title {
+    font-size: 1.1rem !important;
+    padding: 12px !important;
+  }
+  
+  .v-card-text {
+    padding: 12px !important;
+  }
+}
+
+/* Ship controls responsive */
+@media (max-width: 768px) {
+  .ship-controls .v-btn {
+    margin-bottom: 8px;
+  }
+  
+  .ship-controls .v-chip {
+    font-size: 0.7rem !important;
+  }
+}
+
+/* Better spacing for mobile cards */
+@media (max-width: 600px) {
+  .v-card {
+    margin-bottom: 12px !important;
+  }
+  
+  .v-card-title {
+    font-size: 1rem !important;
+    padding: 8px 12px !important;
+    line-height: 1.2 !important;
+  }
+  
+  .v-card-text {
+    padding: 8px 12px !important;
+  }
+  
+  .v-btn {
+    min-width: auto !important;
+  }
+}
+
+/* Improve game board visibility on mobile */
+@media (max-width: 480px) {
+  .game-board-card {
+    margin: 4px 0 !important;
+  }
+  
+  .v-expansion-panels {
+    margin-top: 8px;
+  }
+  
+  .v-list-item {
+    min-height: 36px !important;
+    padding: 4px 8px !important;
+  }
+  
+  .v-stepper-header {
+    flex-direction: column !important;
+  }
+  
+  .v-stepper-item {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+}
+
+/* Snackbar positioning for mobile */
+@media (max-width: 600px) {
+  .v-snackbar {
+    margin: 8px !important;
+    max-width: calc(100% - 16px) !important;
+  }
+}
+
+/* Loading and transition improvements */
+.v-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.v-card:hover {
+  transform: translateY(-2px);
+}
+
+.v-btn {
+  transition: all 0.2s ease !important;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-primary-rgb), 0.6);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--v-theme-primary-rgb), 0.8);
+}
+
+/* Better focus indicators for accessibility */
+.v-btn:focus-visible {
+  outline: 2px solid var(--v-theme-primary);
+  outline-offset: 2px;
+}
+
+.cell:focus-visible {
+  outline: 2px solid var(--v-theme-primary);
+  outline-offset: 2px;
+}
+
+/* Loading states */
+.v-card.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Game state indicators */
+.game-status-indicator {
+  position: fixed;
+  top: 80px;
+  right: 16px;
+  z-index: 1000;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 600px) {
+  .game-status-indicator {
+    top: 64px;
+    right: 8px;
+    left: 8px;
+    text-align: center;
+  }
+}

@@ -1,37 +1,92 @@
 <template>
-  <div class="ship-controls">
-    <h3>Đặt Tàu Chiến:</h3>
-    <div class="ship-buttons">
-      <button 
-        v-for="ship in shipTypes" 
-        :key="ship.name"
-        :class="['ship-btn', { 
-          active: selectedShipName === ship.name,
-          disabled: !canPlaceMoreShips(ship)
-        }]"
-        :data-size="ship.size" 
-        :data-name="ship.name"
-        @click="selectShip(ship)"
-        :disabled="!canPlaceMoreShips(ship)"
-      >
-        {{ ship.name }} ({{ ship.size }} ô)
-        <span v-if="getShipCount(ship) > 0" class="ship-count">
-          {{ getShipCount(ship) }}/{{ ship.count }}
-        </span>
-      </button>
-    </div>
-    <div class="placement-controls">
-      <button @click="rotateShip" class="control-btn">
-        🔄 Xoay (R)
-      </button>
-      <button @click="clearAllShips" class="control-btn">
-        🗑️ Xóa Tất Cả Tàu
-      </button>
-      <span class="direction-indicator">
-        Hướng: <span>{{ isHorizontal ? 'Ngang' : 'Dọc' }}</span>
-      </span>
-    </div>
-  </div>
+  <v-card 
+    class="ship-controls"
+    elevation="3"
+    rounded="lg"
+  >
+    <v-card-title class="text-h6 pb-2">
+      <v-icon left color="primary">mdi-ferry</v-icon>
+      Đặt Tàu Chiến
+    </v-card-title>
+    
+    <v-card-text>
+      <!-- Ship Selection Buttons -->
+      <v-row class="ship-buttons mb-4">
+        <v-col 
+          v-for="ship in shipTypes" 
+          :key="ship.name"
+          cols="12"
+          sm="6"
+          md="4"
+        >
+          <v-btn
+            :color="selectedShipName === ship.name ? 'primary' : 'surface'"
+            :variant="selectedShipName === ship.name ? 'elevated' : 'outlined'"
+            :disabled="!canPlaceMoreShips(ship)"
+            :data-size="ship.size" 
+            :data-name="ship.name"
+            @click="selectShip(ship)"
+            block
+            size="large"
+            class="ship-btn"
+          >
+            <div class="text-center">
+              <div class="font-weight-bold">{{ ship.name }}</div>
+              <div class="text-caption">({{ ship.size }} ô)</div>
+              <v-chip 
+                v-if="getShipCount(ship) > 0" 
+                color="accent"
+                size="x-small"
+                class="mt-1"
+              >
+                {{ getShipCount(ship) }}/{{ ship.count }}
+              </v-chip>
+            </div>
+          </v-btn>
+        </v-col>
+      </v-row>
+      
+      <!-- Placement Controls -->
+      <v-row class="placement-controls align-center">
+        <v-col cols="12" sm="4">
+          <v-btn
+            @click="rotateShip"
+            color="secondary"
+            variant="outlined"
+            prepend-icon="mdi-rotate-3d-variant"
+            block
+          >
+            Xoay (R)
+          </v-btn>
+        </v-col>
+        
+        <v-col cols="12" sm="4">
+          <v-btn
+            @click="clearAllShips"
+            color="error"
+            variant="outlined"
+            prepend-icon="mdi-delete-sweep"
+            block
+          >
+            Xóa Tất Cả
+          </v-btn>
+        </v-col>
+        
+        <v-col cols="12" sm="4">
+          <v-chip
+            :color="isHorizontal ? 'info' : 'warning'"
+            size="large"
+            class="direction-indicator"
+          >
+            <v-icon left>
+              {{ isHorizontal ? 'mdi-arrow-right' : 'mdi-arrow-down' }}
+            </v-icon>
+            {{ isHorizontal ? 'Ngang' : 'Dọc' }}
+          </v-chip>
+        </v-col>
+      </v-row>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>

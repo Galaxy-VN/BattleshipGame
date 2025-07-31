@@ -117,6 +117,12 @@ export default {
         { name: 'Tàu Tuần Dương', size: 3, count: 1 },
         { name: 'Tàu Ngầm', size: 3, count: 1 },
         { name: 'Tàu Khu Trục', size: 2, count: 1 }
+      ],
+      legendItems: [
+        { label: 'Tàu của bạn', color: 'ship-gray' },
+        { label: 'Tàu bị trúng', color: 'error' },
+        { label: 'Bạn bắn trúng', color: 'success' },
+        { label: 'Bắn trượt', color: 'info' }
       ]
     }
   },

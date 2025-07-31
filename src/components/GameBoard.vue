@@ -1,55 +1,62 @@
 <template>
-    <div class="game-board" :class="[boardType, { disabled }]">
-    <!-- Grid Labels -->
-    <div class="grid-labels">
-      <div class="corner-label"></div>
-      <div 
-        v-for="col in gridSize" 
-        :key="`col-${col}`" 
-        class="col-label"
-      >
-        {{ String.fromCharCode(64 + col) }}
-      </div>
-    </div>
-    
-    <!-- Game Grid -->
-    <div class="grid-container">
-      <div class="row-labels">
+  <v-card 
+    class="game-board-card"
+    :class="[boardType, { disabled }]"
+    elevation="3"
+    rounded="lg"
+  >
+    <div class="game-board">
+      <!-- Grid Labels -->
+      <div class="grid-labels">
+        <div class="corner-label"></div>
         <div 
-          v-for="row in gridSize" 
-          :key="`row-${row}`" 
-          class="row-label"
+          v-for="col in gridSize" 
+          :key="`col-${col}`" 
+          class="col-label"
         >
-          {{ row }}
+          {{ String.fromCharCode(64 + col) }}
         </div>
       </div>
       
-      <div class="grid">
-        <div 
-          v-for="cell in cells" 
-          :key="`${boardType}-${cell.row}-${cell.col}`"
-          :class="[
-            'cell',
-            {
-              'ship': cell.ship,
-              'hit': cell.hit,
-              'miss': cell.miss,
-              'highlight': cell.highlight,
-              'preview': cell.preview,
-              'invalid-preview': cell.invalidPreview,
-              'disabled': disabled
-            }
-          ]"
-          :data-row="cell.row"
-          :data-col="cell.col"
-          @click="handleCellClick(cell)"
-          @mouseenter="handleCellHover(cell)"
-          @mouseleave="handleCellLeave(cell)"
-        >
+      <!-- Game Grid -->
+      <div class="grid-container">
+        <div class="row-labels">
+          <div 
+            v-for="row in gridSize" 
+            :key="`row-${row}`" 
+            class="row-label"
+          >
+            {{ row }}
+          </div>
+        </div>
+        
+        <div class="grid">
+          <div 
+            v-for="cell in cells" 
+            :key="`${boardType}-${cell.row}-${cell.col}`"
+            :class="[
+              'cell',
+              {
+                'ship': cell.ship,
+                'hit': cell.hit,
+                'miss': cell.miss,
+                'highlight': cell.highlight,
+                'preview': cell.preview,
+                'invalid-preview': cell.invalidPreview,
+                'disabled': disabled
+              }
+            ]"
+            :data-row="cell.row"
+            :data-col="cell.col"
+            @click="handleCellClick(cell)"
+            @mouseenter="handleCellHover(cell)"
+            @mouseleave="handleCellLeave(cell)"
+          >
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </v-card>
 </template>
 
 <script>
