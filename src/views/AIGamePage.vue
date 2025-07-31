@@ -6,43 +6,30 @@
         <p>Thách thức đối thủ máy tính thông minh</p>
       </header>
 
-      <!-- Game Status -->
-      <div class="game-status" v-if="gameEngine">
-        <div class="status-info">
-          <div class="game-mode">
-            <span class="label">Trạng thái:</span>
-            <span :class="['status', gameState.gameMode]">
-              {{ getGameModeText() }}
-            </span>
-          </div>
-          <div class="current-player" v-if="gameState.gameMode === 'playing'">
-            <span class="label">Lượt:</span>
-            <span :class="['player', gameState.currentPlayer]">
-              {{ gameState.currentPlayer === 'human' ? 'Của bạn' : 'AI' }}
-            </span>
-          </div>
-          <div class="difficulty">
-            <span class="label">Độ khó:</span>
-            <select v-model="selectedDifficulty" @change="changeDifficulty" :disabled="gameState.isGameStarted">
-              <option value="easy">Dễ</option>
-              <option value="medium">Trung bình</option>
-              <option value="hard">Khó</option>
-            </select>
-          </div>
+      <!-- Game Status - Moved to overlay -->
+      <!-- Game Statistics moved to overlay -->
+
+      <!-- Difficulty Selection -->
+      <div class="difficulty-section">
+        <h3>⚙️ Chọn độ khó AI:</h3>
+        <div class="difficulty-selector">
+          <button 
+            v-for="diff in difficultyOptions" 
+            :key="diff.value"
+            :class="['difficulty-btn', { 
+              active: selectedDifficulty === diff.value,
+              disabled: gameState.isGameStarted 
+            }]"
+            @click="changeDifficulty(diff.value)"
+            :disabled="gameState.isGameStarted"
+          >
+            {{ diff.label }}
+          </button>
         </div>
-        
-        <!-- Game Statistics -->
-        <div class="game-stats" v-if="gameState.isGameStarted">
-          <div class="stat-item">
-            <span class="stat-label">Bạn:</span>
-            <span class="stat-value">{{ gameState.stats.humanHits }}/{{ gameState.stats.humanShots }}</span>
-            <span class="accuracy">({{ getAccuracy().human }}%)</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">AI:</span>
-            <span class="stat-value">{{ gameState.stats.aiHits }}/{{ gameState.stats.aiShots }}</span>
-            <span class="accuracy">({{ getAccuracy().ai }}%)</span>
-          </div>
+        <div class="difficulty-description">
+          <p v-if="selectedDifficulty === 'easy'">🟢 <strong>Dễ:</strong> AI bắn ngẫu nhiên, phù hợp cho người mới</p>
+          <p v-if="selectedDifficulty === 'medium'">🟡 <strong>Trung bình:</strong> AI sử dụng chiến thuật hunt & target</p>
+          <p v-if="selectedDifficulty === 'hard'">🔴 <strong>Khó:</strong> AI phân tích xác suất, rất thông minh</p>
         </div>
       </div>
 
@@ -63,6 +50,7 @@
             @click="autoPlaceShips" 
             class="action-btn auto-btn"
             :disabled="placedShips.length > 0"
+            v-if="gameState.gameMode === 'setup'"
           >
             ⚡ Đặt Tàu Tự Động
           </button>
@@ -70,8 +58,23 @@
             @click="startAIGame" 
             class="action-btn start-btn"
             :disabled="!canStartGame"
+            v-if="gameState.gameMode === 'setup'"
           >
             🚀 Bắt Đầu Chơi
+          </button>
+          <button 
+            @click="resetGame" 
+            class="action-btn reset-btn"
+            v-if="gameState.isGameFinished"
+          >
+            🔄 Chơi Lại
+          </button>
+          <button 
+            @click="showAIShips = !showAIShips" 
+            class="action-btn debug-btn"
+            v-if="gameState.gameMode === 'playing' && showDebugMode"
+          >
+            👁️ {{ showAIShips ? 'Ẩn' : 'Hiện' }} Tàu AI
           </button>
         </div>
       </div>
@@ -108,15 +111,48 @@
         </div>
       </div>
 
-      <!-- Game Controls -->
-      <div class="game-controls">
-        <button @click="resetGame" class="control-btn reset-btn">
-          🔄 Chơi Lại
-        </button>
+      <!-- Information Area -->
+      <div class="info-area">
+        <div class="legend">
+          <h3>🎨 Chú giải màu:</h3>
+          <div class="legend-item">
+            <span class="legend-color ship"></span> Tàu của bạn
+          </div>
+          <div class="legend-item">
+            <span class="legend-color my-ship-hit"></span> Tàu bị AI bắn trúng
+          </div>
+          <div class="legend-item">
+            <span class="legend-color opponent-hit"></span> Bạn bắn trúng AI
+          </div>
+          <div class="legend-item">
+            <span class="legend-color miss"></span> Bắn trượt
+          </div>
+        </div>
+
+        <div class="hotkey-guide">
+          <h3>⌨️ Hướng dẫn phím tắt (Di chuột vào ô và bấm):</h3>
+          <div class="guide-columns">
+            <div class="guide-column">
+              <h4>🚢 Trên Bảng Của Bạn (Chế độ đặt tàu):</h4>
+              <p><code>1</code> : Đặt/Xóa Tàu</p>
+              <p><code>0</code> / <code>C</code> : Xóa ô</p>
+              <p><code>R</code> : Xoay hướng đặt tàu</p>
+            </div>
+            <div class="guide-column">
+              <h4>🎯 Trên Bảng AI (Khi chơi):</h4>
+              <p><code>Click</code> : Bắn vào ô</p>
+              <p><code>Space</code> : Đặt tàu tự động</p>
+              <p><code>Enter</code> : Bắt đầu game</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Controls - Only for debug when playing -->
+      <div class="game-controls" v-if="gameState.gameMode === 'playing' && showDebugMode && !gameState.isGameFinished">
         <button 
           @click="showAIShips = !showAIShips" 
-          class="control-btn debug-btn"
-          v-if="gameState.gameMode === 'playing' && showDebugMode"
+          class="game-btn debug-btn"
         >
           👁️ {{ showAIShips ? 'Ẩn' : 'Hiện' }} Tàu AI
         </button>
@@ -161,6 +197,55 @@
           <span>AI đang suy nghĩ...</span>
         </div>
       </div>
+
+      <!-- Status Overlay - Bottom Left -->
+      <div class="status-overlay" v-if="gameEngine">
+        <div class="status-header">
+          <h4>📊 Trạng Thái Game</h4>
+          <button class="toggle-stats" @click="toggleStatsExpanded">
+            {{ isStatsExpanded ? '▼' : '▲' }}
+          </button>
+        </div>
+        
+        <div class="status-content">
+          <div class="game-mode-overlay">
+            <span class="overlay-label">🎮</span>
+            <span :class="['status-badge-overlay', gameState.gameMode]">
+              {{ getGameModeText() }}
+            </span>
+          </div>
+          
+          <div class="current-player-overlay" v-if="gameState.gameMode === 'playing'">
+            <span class="overlay-label">🎯</span>
+            <span :class="['player-badge-overlay', gameState.currentPlayer]">
+              {{ gameState.currentPlayer === 'human' ? 'Lượt của bạn' : 'Lượt AI' }}
+            </span>
+          </div>
+        </div>
+        
+        <!-- Expandable Game Statistics -->
+        <div class="stats-content" v-if="gameState.isGameStarted && isStatsExpanded">
+          <div class="stats-divider"></div>
+          <div class="stat-row-overlay">
+            <div class="stat-item-overlay human">
+              <span class="stat-icon">👤</span>
+              <div class="stat-details">
+                <span class="stat-label-overlay">Bạn</span>
+                <span class="stat-value-overlay">{{ gameState.stats.humanHits }}/{{ gameState.stats.humanShots }}</span>
+                <span class="accuracy-overlay">({{ getAccuracy().human }}%)</span>
+              </div>
+            </div>
+            <div class="stat-item-overlay ai">
+              <span class="stat-icon">🤖</span>
+              <div class="stat-details">
+                <span class="stat-label-overlay">AI</span>
+                <span class="stat-value-overlay">{{ gameState.stats.aiHits }}/{{ gameState.stats.aiShots }}</span>
+                <span class="accuracy-overlay">({{ getAccuracy().ai }}%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -188,6 +273,13 @@ export default {
       showAIShips: false,
       showDebugMode: false, // Set to true for development
       aiThinking: false,
+      isStatsExpanded: false, // New property for stats toggle
+      
+      difficultyOptions: [
+        { value: 'easy', label: 'Dễ' },
+        { value: 'medium', label: 'Trung bình' },
+        { value: 'hard', label: 'Khó' }
+      ],
       
       shipTypes: [
         { name: 'Tàu Sân Bay', size: 5, count: 1 },
@@ -272,7 +364,10 @@ export default {
       return this.gameEngine ? this.gameEngine.getAccuracy() : { human: 0, ai: 0 }
     },
     
-    changeDifficulty() {
+    changeDifficulty(difficulty) {
+      if (this.gameState.isGameStarted) return
+      
+      this.selectedDifficulty = difficulty
       if (this.gameEngine) {
         this.gameEngine.setAIDifficulty(this.selectedDifficulty)
         this.showMessage(`Đã chuyển độ khó: ${this.getDifficultyText()}`, 'info')
@@ -286,6 +381,10 @@ export default {
         hard: 'Khó'
       }
       return difficultyMap[this.selectedDifficulty] || 'Không xác định'
+    },
+    
+    toggleStatsExpanded() {
+      this.isStatsExpanded = !this.isStatsExpanded
     },
     
     // Ship placement methods
@@ -536,96 +635,242 @@ header p {
   opacity: 0.8;
 }
 
-/* Game Status */
-.game-status {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+/* Status Overlay - Bottom Left */
+.status-overlay {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(248, 249, 250, 0.9),
+    rgba(240, 248, 255, 0.85)
+  );
+  border-radius: 15px;
+  box-shadow: 
+    0 8px 32px rgba(13, 71, 161, 0.2),
+    inset 0 2px 8px rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(15px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 16px;
+  max-width: 320px;
+  min-width: 280px;
+  z-index: 1000;
+  transition: all 0.4s ease;
+  transform: translateY(0);
+}
+
+.status-overlay:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 12px 40px rgba(13, 71, 161, 0.25),
+    inset 0 2px 8px rgba(255, 255, 255, 0.4);
+}
+
+.status-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(13, 71, 161, 0.1);
 }
 
-.status-info {
+.status-header h4 {
+  margin: 0;
+  color: rgba(13, 71, 161, 0.9);
+  font-size: 1.1em;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.toggle-stats {
+  background: linear-gradient(135deg, 
+    rgba(13, 71, 161, 0.1), 
+    rgba(25, 118, 210, 0.1)
+  );
+  border: 1px solid rgba(13, 71, 161, 0.3);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
   display: flex;
-  gap: 30px;
   align-items: center;
-  flex-wrap: wrap;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(13, 71, 161, 0.8);
+  font-weight: bold;
+  transition: all 0.3s ease;
+  font-size: 0.9em;
 }
 
-.status-info > div {
+.toggle-stats:hover {
+  background: linear-gradient(135deg, 
+    rgba(13, 71, 161, 0.2), 
+    rgba(25, 118, 210, 0.2)
+  );
+  transform: scale(1.1);
+  border-color: rgba(13, 71, 161, 0.5);
+}
+
+.status-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-mode-overlay,
+.current-player-overlay {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.label {
+.overlay-label {
+  font-size: 1.1em;
+  width: 24px;
+  text-align: center;
+}
+
+.status-badge-overlay {
+  padding: 6px 12px;
+  border-radius: 15px;
   font-weight: 600;
-  color: var(--text-color);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  flex: 1;
+  text-align: center;
 }
 
-.status.setup {
-  color: var(--warning-color);
-  font-weight: bold;
+.status-badge-overlay.setup {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  color: #856404;
+  border-color: #ffeaa7;
 }
 
-.status.playing {
-  color: var(--success-color);
-  font-weight: bold;
+.status-badge-overlay.playing {
+  background: linear-gradient(135deg, #d1ecf1, #74b9ff);
+  color: #0c5460;
+  border-color: #74b9ff;
+  animation: pulse-overlay 2s infinite;
 }
 
-.status.finished {
-  color: var(--hit-color);
-  font-weight: bold;
+.status-badge-overlay.finished {
+  background: linear-gradient(135deg, #f8d7da, #fd79a8);
+  color: #721c24;
+  border-color: #fd79a8;
 }
 
-.player.human {
-  color: var(--success-color);
-  font-weight: bold;
+@keyframes pulse-overlay {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
 }
 
-.player.ai {
-  color: var(--warning-color);
-  font-weight: bold;
-}
-
-.difficulty select {
+.player-badge-overlay {
   padding: 5px 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 0.9em;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.8em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  flex: 1;
+  text-align: center;
 }
 
-.game-stats {
-  display: flex;
-  gap: 20px;
+.player-badge-overlay.human {
+  background: linear-gradient(135deg, #d4edda, #00b894);
+  color: #155724;
+  border: 1px solid #00b894;
 }
 
-.stat-item {
+.player-badge-overlay.ai {
+  background: linear-gradient(135deg, #fff3cd, #fdcb6e);
+  color: #856404;
+  border: 1px solid #fdcb6e;
+}
+
+.stats-content {
+  margin-top: 8px;
+  transition: all 0.4s ease;
+}
+
+.stats-divider {
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(13, 71, 161, 0.3), 
+    transparent
+  );
+  margin: 12px 0;
+}
+
+.stat-row-overlay {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+.stat-item-overlay {
+  display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
 }
 
-.stat-label {
-  font-size: 0.9em;
+.stat-item-overlay.human {
+  background: linear-gradient(135deg, 
+    rgba(0, 184, 148, 0.1), 
+    rgba(0, 184, 148, 0.05)
+  );
+  border: 1px solid rgba(0, 184, 148, 0.2);
+}
+
+.stat-item-overlay.ai {
+  background: linear-gradient(135deg, 
+    rgba(253, 203, 110, 0.1), 
+    rgba(253, 203, 110, 0.05)
+  );
+  border: 1px solid rgba(253, 203, 110, 0.2);
+}
+
+.stat-item-overlay:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  font-size: 1.2em;
+  width: 24px;
+  text-align: center;
+}
+
+.stat-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 2px;
+}
+
+.stat-label-overlay {
+  font-weight: 600;
+  font-size: 0.85em;
   color: var(--text-color);
-  opacity: 0.8;
 }
 
-.stat-value {
+.stat-value-overlay {
   font-weight: bold;
+  font-size: 0.9em;
   color: var(--primary-color);
 }
 
-.accuracy {
-  font-size: 0.8em;
+.accuracy-overlay {
+  font-size: 0.75em;
   color: var(--secondary-color);
+  opacity: 0.8;
 }
 
 /* Setup Actions */
@@ -633,7 +878,13 @@ header p {
   display: flex;
   gap: 15px;
   justify-content: center;
-  margin: 20px 0;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 30px 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
 }
 
 .action-btn {
@@ -646,6 +897,8 @@ header p {
   transition: all 0.3s ease;
   font-weight: 600;
   font-size: 1em;
+  white-space: nowrap;
+  min-width: 160px;
 }
 
 .action-btn:hover:not(:disabled) {
@@ -654,18 +907,38 @@ header p {
 }
 
 .action-btn:disabled {
-  background: #ccc;
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
 .auto-btn {
-  background: linear-gradient(135deg, var(--warning-color), #f57c00);
+  background: linear-gradient(135deg, var(--success-color), #4caf50);
+}
+
+.auto-btn:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
 }
 
 .start-btn {
-  background: linear-gradient(135deg, var(--success-color), #2e7d32);
+  background: linear-gradient(135deg, var(--primary-color), #1976d2);
+}
+
+.reset-btn {
+  background: linear-gradient(135deg, var(--warning-color), #f57c00);
+}
+
+.reset-btn:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.3);
+}
+
+.debug-btn {
+  background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+}
+
+.debug-btn:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(156, 39, 176, 0.3);
 }
 
 /* Game Area */
@@ -694,29 +967,355 @@ header p {
 /* Game Controls */
 .game-controls {
   display: flex;
-  gap: 15px;
+  gap: 20px;
   justify-content: center;
   margin: 30px 0;
+  padding: 25px;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(248, 249, 250, 0.9),
+    rgba(240, 248, 255, 0.85)
+  );
+  border-radius: 20px;
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.12),
+    inset 0 2px 8px rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
-.control-btn {
-  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
+.game-controls::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--primary-color));
+  opacity: 0.7;
+}
+
+.game-btn {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.95), 
+    rgba(240, 248, 255, 0.95)
+  );
+  color: var(--primary-color);
+  border: 3px solid var(--primary-color);
+  padding: 14px 24px;
+  border-radius: 30px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
+  transition: all 0.4s ease;
+  font-weight: 700;
+  font-size: 1.05em;
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.1),
+    inset 0 2px 5px rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
-.control-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(13, 71, 161, 0.3);
+.game-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.4), 
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.game-btn:hover::before {
+  left: 100%;
+}
+
+.game-btn:hover {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 
+    0 8px 25px rgba(13, 71, 161, 0.4),
+    inset 0 2px 10px rgba(255, 255, 255, 0.2);
+  border-color: var(--secondary-color);
+}
+
+.reset-btn {
+  background: linear-gradient(135deg, 
+    rgba(255, 248, 240, 0.95), 
+    rgba(255, 243, 224, 0.95)
+  );
+  color: var(--warning-color);
+  border-color: var(--warning-color);
+}
+
+.reset-btn:hover {
+  background: linear-gradient(135deg, var(--warning-color), #f57c00);
+  color: white;
+  border-color: #f57c00;
+  box-shadow: 
+    0 8px 25px rgba(255, 152, 0, 0.4),
+    inset 0 2px 10px rgba(255, 255, 255, 0.2);
 }
 
 .debug-btn {
+  background: linear-gradient(135deg, 
+    rgba(252, 245, 255, 0.95), 
+    rgba(248, 235, 255, 0.95)
+  );
+  color: #9c27b0;
+  border-color: #9c27b0;
+}
+
+.debug-btn:hover {
   background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+  color: white;
+  border-color: #7b1fa2;
+  box-shadow: 
+    0 8px 25px rgba(156, 39, 176, 0.4),
+    inset 0 2px 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Difficulty Selection */
+.difficulty-section {
+  text-align: center;
+  margin: 30px 0;
+  padding: 30px;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.2), 
+    rgba(240, 248, 255, 0.15),
+    rgba(225, 245, 255, 0.1)
+  );
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(13, 71, 161, 0.1),
+    inset 0 2px 10px rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.difficulty-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(13, 71, 161, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(25, 118, 210, 0.1) 0%, transparent 50%);
+  z-index: -1;
+}
+
+.difficulty-section h3 {
+  color: rgba(13, 71, 161, 0.9);
+  margin-bottom: 25px;
+  font-size: 1.4em;
+  text-shadow: 
+    2px 2px 4px rgba(255, 255, 255, 0.8),
+    0 0 10px rgba(13, 71, 161, 0.2);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.difficulty-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.difficulty-btn {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.8), 
+    rgba(240, 248, 255, 0.7),
+    rgba(225, 245, 255, 0.6)
+  );
+  color: var(--primary-color);
+  border: 2px solid rgba(13, 71, 161, 0.4);
+  padding: 14px 22px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  font-weight: 700;
+  font-size: 1em;
+  text-align: center;
+  box-shadow: 
+    0 4px 15px rgba(13, 71, 161, 0.15),
+    inset 0 2px 5px rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.difficulty-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.4), 
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.difficulty-btn:hover:not(.disabled)::before {
+  left: 100%;
+}
+
+.difficulty-btn:hover:not(.disabled) {
+  background: linear-gradient(135deg, 
+    rgba(13, 71, 161, 0.9), 
+    rgba(25, 118, 210, 0.8)
+  );
+  color: white;
+  transform: translateY(-4px);
+  box-shadow: 
+    0 8px 25px rgba(13, 71, 161, 0.3),
+    inset 0 2px 10px rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.difficulty-btn.active {
+  background: linear-gradient(135deg, 
+    rgba(13, 71, 161, 0.95), 
+    rgba(25, 118, 210, 0.9)
+  );
+  color: white;
+  box-shadow: 
+    0 8px 25px rgba(13, 71, 161, 0.4),
+    inset 0 2px 10px rgba(255, 255, 255, 0.3);
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.difficulty-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+  color: #999;
+  border-color: #ddd;
+}
+
+.difficulty-btn.disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.difficulty-description {
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.difficulty-description p {
+  font-size: 1.05em;
+  color: var(--text-color);
+  margin: 0;
+  padding: 15px 25px;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.7), 
+    rgba(248, 249, 250, 0.6),
+    rgba(240, 248, 255, 0.5)
+  );
+  border-radius: 15px;
+  box-shadow: 
+    0 4px 15px rgba(13, 71, 161, 0.1),
+    inset 0 2px 5px rgba(255, 255, 255, 0.4);
+  border-left: 4px solid rgba(13, 71, 161, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Information Area */
+.info-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin: 40px 0;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+}
+
+.legend h3,
+.hotkey-guide h3 {
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.legend-color.ship {
+  background: var(--ship-color);
+}
+
+.legend-color.my-ship-hit {
+  background: var(--my-ship-hit-color);
+}
+
+.legend-color.opponent-hit {
+  background: var(--hit-color);
+}
+
+.legend-color.miss {
+  background: var(--miss-color);
+}
+
+.guide-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.guide-column h4 {
+  color: var(--secondary-color);
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.guide-column p {
+  margin-bottom: 5px;
+  font-size: 0.9em;
+}
+
+.guide-column code {
+  background: var(--background-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  color: var(--primary-color);
 }
 
 /* Game Over Modal */
@@ -844,6 +1443,21 @@ header p {
   .game-stats {
     gap: 15px;
   }
+  
+  .difficulty-selector {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .difficulty-section {
+    padding: 20px;
+    margin: 20px 0;
+  }
+  
+  .game-controls {
+    padding: 20px;
+    gap: 15px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -858,6 +1472,60 @@ header p {
   .game-area {
     grid-template-columns: 1fr;
     gap: 30px;
+  }
+  
+  .game-controls {
+    flex-direction: column;
+    padding: 15px;
+    gap: 12px;
+  }
+  
+  .game-btn, .difficulty-btn {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 1em;
+  }
+  
+  .difficulty-section {
+    padding: 15px;
+    margin: 15px 0;
+  }
+  
+  .difficulty-description p {
+    padding: 12px 15px;
+    font-size: 0.95em;
+  }
+  
+  .status-badge, .player-badge {
+    padding: 8px 12px;
+    font-size: 0.9em;
+  }
+  
+  .status-overlay {
+    bottom: 10px;
+    left: 10px;
+    max-width: 260px;
+    min-width: 240px;
+    padding: 12px;
+  }
+  
+  .status-header h4 {
+    font-size: 1em;
+  }
+  
+  .toggle-stats {
+    width: 24px;
+    height: 24px;
+    font-size: 0.8em;
+  }
+  
+  .stat-item-overlay {
+    padding: 6px;
+  }
+  
+  .stat-icon {
+    font-size: 1em;
+    width: 20px;
   }
   
   .game-status {
@@ -878,10 +1546,39 @@ header p {
     justify-content: space-around;
   }
   
+  .info-area {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .difficulty-section {
+    padding: 20px;
+  }
+  
+  .difficulty-selector {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .guide-columns {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
   .setup-actions,
   .game-controls {
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 15px;
+  }
+  
+  .action-btn,
+  .game-btn {
+    min-width: 140px;
+    flex: 1;
+    max-width: 200px;
   }
   
   .modal-content {
@@ -906,10 +1603,90 @@ header p {
     padding: 15px;
   }
   
+  .setup-actions {
+    padding: 15px;
+    gap: 10px;
+  }
+  
+  .difficulty-section {
+    padding: 15px;
+    margin: 20px 0;
+  }
+  
+  .difficulty-section h3 {
+    font-size: 1.1em;
+  }
+  
+  .difficulty-btn {
+    padding: 10px 16px;
+    font-size: 0.9em;
+  }
+  
+  .info-area {
+    padding: 15px;
+    gap: 15px;
+  }
+  
   .action-btn,
-  .control-btn {
-    width: 100%;
-    max-width: 250px;
+  .game-btn {
+    min-width: 120px;
+    padding: 10px 16px;
+    font-size: 0.9em;
+  }
+  
+  .difficulty-selector {
+    grid-template-columns: 1fr;
+  }
+  
+  .difficulty-btn {
+    padding: 10px;
+    font-size: 0.9em;
+  }
+  
+  .status-overlay {
+    bottom: 5px;
+    left: 5px;
+    max-width: 220px;
+    min-width: 200px;
+    padding: 10px;
+  }
+  
+  .status-header h4 {
+    font-size: 0.9em;
+  }
+  
+  .toggle-stats {
+    width: 22px;
+    height: 22px;
+    font-size: 0.75em;
+  }
+  
+  .status-badge-overlay,
+  .player-badge-overlay {
+    font-size: 0.75em;
+    padding: 4px 8px;
+  }
+  
+  .stat-item-overlay {
+    padding: 5px;
+    gap: 8px;
+  }
+  
+  .stat-icon {
+    font-size: 0.9em;
+    width: 18px;
+  }
+  
+  .stat-label-overlay {
+    font-size: 0.75em;
+  }
+  
+  .stat-value-overlay {
+    font-size: 0.8em;
+  }
+  
+  .accuracy-overlay {
+    font-size: 0.7em;
   }
 }
 </style>
