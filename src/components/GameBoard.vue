@@ -1,51 +1,80 @@
 <template>
-    <div class="game-board" :class="[boardType, { disabled }]">
-    <!-- Grid Labels -->
-    <div class="grid-labels">
-      <div class="corner-label"></div>
-      <div 
-        v-for="col in gridSize" 
-        :key="`col-${col}`" 
-        class="col-label"
-      >
-        {{ String.fromCharCode(64 + col) }}
-      </div>
-    </div>
-    
-    <!-- Game Grid -->
-    <div class="grid-container">
-      <div class="row-labels">
-        <div 
-          v-for="row in gridSize" 
-          :key="`row-${row}`" 
-          class="row-label"
-        >
-          {{ row }}
+  <div 
+    :class="[
+      'w-full max-w-full mx-auto bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 overflow-hidden transition-all duration-300',
+      boardType === 'my' ? 'hover:shadow-2xl hover:scale-[1.005]' : 'hover:shadow-xl',
+      { 'opacity-60 cursor-not-allowed': disabled }
+    ]"
+  >
+    <div class="p-2">
+      <div class="flex flex-col items-center gap-1 w-full">
+        <!-- Grid Labels -->
+        <div class="grid gap-1 justify-center items-center mb-2"
+             :style="{ gridTemplateColumns: `${labelSize} repeat(${gridSize}, ${labelSize})` }">
+          <div :style="{ width: labelSize, height: labelSize }"></div>
+          <div
+            v-for="col in gridSize"
+            :key="`col-${col}`"
+            class="flex items-center justify-center font-bold text-sm bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-lg border border-blue-200 shadow-sm"
+            :style="{ width: labelSize, height: labelSize }"
+          >
+            {{ String.fromCharCode(64 + col) }}
+          </div>
         </div>
-      </div>
-      
-      <div class="grid">
-        <div 
-          v-for="cell in cells" 
-          :key="`${boardType}-${cell.row}-${cell.col}`"
-          :class="[
-            'cell',
-            {
-              'ship': cell.ship,
-              'hit': cell.hit,
-              'miss': cell.miss,
-              'highlight': cell.highlight,
-              'preview': cell.preview,
-              'invalid-preview': cell.invalidPreview,
-              'disabled': disabled
-            }
-          ]"
-          :data-row="cell.row"
-          :data-col="cell.col"
-          @click="handleCellClick(cell)"
-          @mouseenter="handleCellHover(cell)"
-          @mouseleave="handleCellLeave(cell)"
-        >
+
+        <!-- Game Grid -->
+        <div class="flex gap-1 justify-center items-start">
+          <div class="flex flex-col gap-1">
+            <div
+              v-for="row in gridSize"
+              :key="`row-${row}`"
+              class="flex items-center justify-center font-bold text-sm bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-lg border border-blue-200 shadow-sm"
+              :style="{ width: labelSize, height: labelSize }"
+            >
+              {{ row }}
+            </div>
+          </div>
+
+          <div class="grid gap-1 p-2 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-xl shadow-xl"
+               :style="{
+                 gridTemplateColumns: `repeat(${gridSize}, ${cellSize})`,
+                 gridTemplateRows: `repeat(${gridSize}, ${cellSize})`
+               }">
+            <div
+              v-for="cell in cells"
+              :key="`${boardType}-${cell.row}-${cell.col}`"
+              :class="[
+                'border border-2 rounded-lg cursor-pointer transition-all duration-300 relative flex items-center justify-center backdrop-blur-sm text-sm select-none',
+                // Base styles
+                !cell.ship && !cell.hit && !cell.miss ? 'bg-white/90 border-white/40 hover:bg-blue-100 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 hover:scale-105' : '',
+                // Ship styles
+                cell.ship && !cell.hit ? 'bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400 text-white shadow-lg' : '',
+                // Hit styles
+                cell.hit && !cell.ship ? 'bg-gradient-to-br from-red-500 to-pink-600 border-red-400 text-white shadow-lg animate-pulse' : '',
+                // Ship hit styles
+                cell.ship && cell.hit ? 'bg-gradient-to-br from-orange-500 to-red-600 border-orange-400 text-white shadow-lg animate-pulse' : '',
+                // Miss styles
+                cell.miss ? 'bg-gradient-to-br from-gray-400 to-gray-500 border-gray-300 text-white' : '',
+                // Preview styles
+                cell.preview ? 'bg-gradient-to-br from-green-400/60 to-emerald-500/60 border-green-400 shadow-lg scale-105 ring-2 ring-green-300' : '',
+                cell.invalidPreview ? 'bg-gradient-to-br from-red-400/60 to-red-500/60 border-red-400 shadow-lg scale-105 ring-2 ring-red-300' : '',
+                // Disabled state
+                disabled ? 'cursor-not-allowed opacity-50' : ''
+              ]"
+              :data-row="cell.row"
+              :data-col="cell.col"
+              :style="{ width: cellSize, height: cellSize }"
+              @click="handleCellClick(cell)"
+              @mouseenter="handleCellHover(cell)"
+              @mouseleave="handleCellLeave(cell)"
+            >
+              <!-- Cell content icons -->
+              <span v-if="cell.ship && !cell.hit" class="text-sm drop-shadow-md">⚓</span>
+              <span v-else-if="cell.hit && !cell.ship" class="text-sm animate-bounce">💥</span>
+              <span v-else-if="cell.ship && cell.hit" class="text-sm animate-fire-pulse">🔥</span>
+              <span v-else-if="cell.miss" class="text-sm opacity-80">💧</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -91,6 +120,28 @@ export default {
     return {
       cells: [],
       hoveredCell: null
+    }
+  },
+  computed: {
+    cellSize() {
+      // Responsive cell sizing based on screen size
+      if (typeof window !== 'undefined') {
+        const width = window.innerWidth
+        if (width < 640) return '1.5rem' // sm: 24px
+        if (width < 1024) return '1.75rem' // md: 28px
+        return '2rem' // lg+: 32px
+      }
+      return '2rem'
+    },
+    labelSize() {
+      // Responsive label sizing
+      if (typeof window !== 'undefined') {
+        const width = window.innerWidth
+        if (width < 640) return '1.5rem'
+        if (width < 1024) return '1.75rem'
+        return '2rem'
+      }
+      return '2rem'
     }
   },
   watch: {
@@ -300,7 +351,6 @@ export default {
           break
       }
     },
-    
     resetBoard() {
       this.cells.forEach(cell => {
         cell.ship = false
@@ -338,217 +388,90 @@ export default {
           }
         }
       }
+    },
+
+    handleResize() {
+      // Force reactivity update on resize for responsive sizing
+      this.$forceUpdate()
     }
+  },
+  mounted() {
+    // Add window resize listener for responsive sizing
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeUnmount() {
+    // Clean up resize listener
+    window.removeEventListener('resize', this.handleResize)
   }
 }
 </script>
 
 <style scoped>
-.game-board {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+/* Enhanced hover effects for interactive cells */
+.cursor-pointer:hover:not(.opacity-50) {
+  transform: translateY(-2px) scale(1.05);
 }
 
-.grid-labels {
-  display: grid;
-  grid-template-columns: 30px repeat(v-bind(gridSize), 35px);
-  gap: 2px;
-  margin-bottom: 5px;
+/* Tối ưu cho desktop 1920x1080 */
+.cursor-pointer:hover:not(.opacity-50) {
+  transform: translateY(-2px) scale(1.05);
 }
 
-.corner-label {
-  width: 30px;
-  height: 25px;
-}
-
-.col-label {
-  width: 35px;
-  height: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  color: var(--primary-color);
-}
-
-.grid-container {
-  display: flex;
-  gap: 5px;
-}
-
-.row-labels {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.row-label {
-  width: 30px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  color: var(--primary-color);
-}
-
+/* Đảm bảo board không quá lớn */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(v-bind(gridSize), 35px);
-  grid-template-rows: repeat(v-bind(gridSize), 35px);
-  gap: 2px;
-  border: 3px solid var(--primary-color);
-  border-radius: 8px;
-  padding: 5px;
-  background: rgba(255, 255, 255, 0.8);
+  max-width: 100%;
 }
 
-.cell {
-  width: 35px;
-  height: 35px;
-  border: 1px solid var(--cell-border-color);
-  background: rgba(255, 255, 255, 0.9);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 3px;
-  position: relative;
+/* Animation for hit effects */
+@keyframes hitPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
 
-.cell:hover {
-  background: var(--hover-color);
-  transform: scale(1.05);
+.animate-pulse {
+  animation: hitPulse 1s ease-in-out infinite;
 }
 
-.cell.ship {
-  background: var(--ship-color);
-  border-color: #37474f;
+/* Custom animations for special effects */
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+  40%, 43% { transform: translate3d(0,-8px,0); }
+  70% { transform: translate3d(0,-4px,0); }
+  90% { transform: translate3d(0,-2px,0); }
 }
 
-.cell.ship::after {
-  content: '🚢';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 18px;
+.animate-bounce {
+  animation: bounce 1s ease-in-out infinite;
 }
 
-.cell.hit {
-  background: var(--hit-color);
-  border-color: #b71c1c;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.cell.hit::after {
-  content: '🔥';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 18px;
-}
-
-.cell.ship.hit {
-  background: var(--my-ship-hit-color);
-}
-
-.cell.ship.hit::after {
-  content: '💥';
-}
-
-.cell.miss {
-  background: var(--miss-color);
-  border-color: #ccc;
-}
-
-.cell.miss::after {
-  content: '●';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #666;
-  font-size: 12px;
-}
-
-.cell.preview {
-  background: rgba(76, 175, 80, 0.3);
-  border-color: var(--success-color);
-}
-
-.cell.invalid-preview {
-  background: rgba(244, 67, 54, 0.3);
-  border-color: var(--hit-color);
-}
-
-.cell.highlight {
-  background: rgba(255, 193, 7, 0.3);
-  border-color: var(--warning-color);
-}
-
-.game-board.disabled .cell {
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.game-board.disabled .cell:hover {
-  transform: none;
-  background: rgba(255, 255, 255, 0.9);
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(v-bind(gridSize), 28px);
-    grid-template-rows: repeat(v-bind(gridSize), 28px);
+@keyframes fire-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 2px rgba(255, 69, 0, 0.5));
   }
-  
-  .cell {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .cell::after {
-    font-size: 14px;
-  }
-  
-  .col-label,
-  .row-label {
-    width: 28px;
-    height: 28px;
-    font-size: 0.9em;
-  }
-  
-  .grid-labels {
-    grid-template-columns: 25px repeat(v-bind(gridSize), 28px);
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.3) drop-shadow(0 0 6px rgba(255, 69, 0, 0.8));
   }
 }
 
-@media (max-width: 480px) {
-  .grid {
-    grid-template-columns: repeat(v-bind(gridSize), 24px);
-    grid-template-rows: repeat(v-bind(gridSize), 24px);
-  }
-  
-  .cell {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .cell::after {
-    font-size: 12px;
-  }
-  
-  .col-label,
-  .row-label {
-    width: 24px;
-    height: 24px;
-    font-size: 0.8em;
-  }
-  
-  .grid-labels {
-    grid-template-columns: 20px repeat(v-bind(gridSize), 24px);
-  }
+@keyframes fire-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-1px); }
+  20%, 40%, 60%, 80% { transform: translateX(1px); }
+}
+
+.animate-spin {
+  animation: spin 2s linear infinite;
+}
+
+.animate-fire-pulse {
+  animation: fire-pulse 1.5s ease-in-out infinite, fire-shake 0.3s ease-in-out infinite;
 }
 </style>

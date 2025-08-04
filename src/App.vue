@@ -1,35 +1,40 @@
 <template>
-  <div id="app">
+  <v-app>
     <!-- Navigation Component -->
     <Navigation 
       :current-page="currentPage"
       @page-changed="handlePageChange"
     />
     
-    <!-- Game Page -->
-    <VirtualGamePage 
-      v-if="currentPage === 'game'"
-    />
-    
-    <!-- AI Game Page -->
-    <AIGamePage 
-      v-if="currentPage === 'ai-game'"
-      @page-changed="handlePageChange"
-    />
-    
-    <!-- Tutorial Page -->
-    <TutorialPage 
-      v-if="currentPage === 'tutorial'"
-    />
-    
-    <!-- About Page -->
-    <AboutPage 
-      v-if="currentPage === 'about'"
-    />
+    <!-- Main Content -->
+    <v-main>
+      <v-container fluid class="pa-0">
+        <!-- Game Page -->
+        <VirtualGamePage 
+          v-if="currentPage === 'game'"
+        />
+        
+        <!-- AI Game Page -->
+        <AIGamePage 
+          v-if="currentPage === 'ai-game'"
+          @page-changed="handlePageChange"
+        />
+        
+        <!-- Tutorial Page -->
+        <TutorialPage 
+          v-if="currentPage === 'tutorial'"
+        />
+        
+        <!-- About Page -->
+        <AboutPage 
+          v-if="currentPage === 'about'"
+        />
+      </v-container>
+    </v-main>
     
     <!-- Message Container -->
     <MessageContainer ref="messageContainer" />
-  </div>
+  </v-app>
 </template>
 
 <script>
@@ -77,43 +82,44 @@ export default {
 </script>
 
 <style>
+/* Ocean-themed background */
 :root {
-  --primary-color: #0d47a1;
-  --secondary-color: #1976d2;
-  --background-color: #e3f2fd;
-  --cell-border-color: #90caf9;
-  --text-color: #212121;
-  --ship-color: #546e7a;
-  --hit-color: #d32f2f;
-  --my-ship-hit-color: #ff8a65;
-  --miss-color: #ffffff;
-  --hover-color: #bbdefb;
-  --success-color: #4caf50;
-  --warning-color: #ff9800;
-  --nav-height: 70px;
+  --nav-height: 64px;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Be Vietnam Pro', sans-serif;
-  background: linear-gradient(135deg, var(--background-color) 0%, #bbdefb 100%);
-  color: var(--text-color);
+.v-application {
+  background: linear-gradient(135deg, 
+    #E3F2FD 0%, 
+    #BBDEFB 25%, 
+    #90CAF9 50%, 
+    #64B5F6 75%, 
+    #42A5F5 100%) !important;
   min-height: 100vh;
-  padding-top: var(--nav-height);
-  margin: 0;
-  overflow-x: hidden;
 }
 
-html {
-  overflow-y: scroll;
+/* Enhanced global styling */
+.v-main {
+  background: transparent;
 }
 
-#app {
-  min-height: 100vh;
+.v-container {
+  max-width: 1400px;
+}
+
+/* Beautiful card hover effects */
+.v-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.v-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+/* Enhanced button styling */
+.v-btn {
+  text-transform: none !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.5px !important;
 }
 </style>

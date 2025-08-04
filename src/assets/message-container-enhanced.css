@@ -1,0 +1,383 @@
+/* Enhanced MessageContainer Styling */
+.message-container {
+  background: linear-gradient(135deg, #263238 0%, #37474F 50%, #455A64 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px;
+  box-shadow: 0 6px 20px rgba(38, 50, 56, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0277BD, #03A9F4, #00BCD4, #03A9F4, #0277BD);
+  background-size: 200% 100%;
+  animation: messageGlow 4s ease-in-out infinite;
+}
+
+@keyframes messageGlow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.message-container:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(38, 50, 56, 0.5);
+}
+
+.message-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.message-title {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.message-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0277BD, #03A9F4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+.message-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.message-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.message-text.primary {
+  color: #03A9F4;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.message-text.success {
+  color: #4CAF50;
+  font-weight: 600;
+  animation: successGlow 1s ease-out;
+}
+
+.message-text.error {
+  color: #F44336;
+  font-weight: 600;
+  animation: errorShake 0.5s ease-out;
+}
+
+.message-text.warning {
+  color: #FF9800;
+  font-weight: 600;
+  animation: warningPulse 1s ease-out;
+}
+
+@keyframes successGlow {
+  0% { text-shadow: 0 0 0 transparent; }
+  50% { text-shadow: 0 0 10px #4CAF50; }
+  100% { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes warningPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.message-subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Game state messages */
+.game-status-message {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid #0277BD;
+  margin: 8px 0;
+}
+
+.turn-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 8px 0;
+}
+
+.turn-indicator.active {
+  background: rgba(3, 169, 244, 0.2);
+  border: 1px solid #03A9F4;
+  animation: turnGlow 2s ease-in-out infinite;
+}
+
+@keyframes turnGlow {
+  0%, 100% { box-shadow: 0 0 0 rgba(3, 169, 244, 0); }
+  50% { box-shadow: 0 0 8px rgba(3, 169, 244, 0.5); }
+}
+
+.turn-indicator.waiting {
+  background: rgba(255, 152, 0, 0.1);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  opacity: 0.7;
+}
+
+.player-name {
+  font-weight: 600;
+  color: white;
+}
+
+.turn-status {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Hit/Miss feedback */
+.shot-result {
+  padding: 12px;
+  border-radius: 8px;
+  margin: 8px 0;
+  text-align: center;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: shotResult 0.8s ease-out;
+}
+
+.shot-result.hit {
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(244, 67, 54, 0.1));
+  color: #F44336;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.shot-result.miss {
+  background: linear-gradient(135deg, rgba(96, 125, 139, 0.2), rgba(96, 125, 139, 0.1));
+  color: #607D8B;
+  border: 1px solid rgba(96, 125, 139, 0.3);
+}
+
+.shot-result.sunk {
+  background: linear-gradient(135deg, rgba(255, 111, 0, 0.2), rgba(255, 111, 0, 0.1));
+  color: #FF6F00;
+  border: 1px solid rgba(255, 111, 0, 0.3);
+}
+
+@keyframes shotResult {
+  0% { 
+    opacity: 0; 
+    transform: translateY(10px) scale(0.9); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: translateY(-2px) scale(1.02); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+/* Progress indicators */
+.game-progress {
+  margin: 12px 0;
+}
+
+.progress-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.ships-remaining {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  margin: 8px 0;
+}
+
+.ship-count {
+  text-align: center;
+}
+
+.ship-count-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ship-count-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+  margin-top: 2px;
+}
+
+/* Timer display */
+.game-timer {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-align: center;
+  margin: 8px auto;
+  display: inline-block;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.timer-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 2px;
+}
+
+.timer-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #03A9F4;
+  font-family: 'Courier New', monospace;
+}
+
+/* Message list for chat/log */
+.message-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  margin: 8px 0;
+}
+
+.message-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.message-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.message-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.message-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.log-entry {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.log-entry:last-child {
+  border-bottom: none;
+}
+
+.log-timestamp {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  margin-right: 8px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .message-container {
+    margin: 8px;
+    padding: 16px;
+    min-height: 100px;
+  }
+  
+  .message-title {
+    font-size: 1.1rem;
+  }
+  
+  .message-text {
+    font-size: 0.9rem;
+  }
+  
+  .ships-remaining {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .message-container {
+    margin: 4px;
+    padding: 12px;
+    min-height: 80px;
+  }
+  
+  .message-title {
+    font-size: 1rem;
+  }
+  
+  .message-text {
+    font-size: 0.85rem;
+  }
+  
+  .turn-indicator {
+    flex-direction: column;
+    gap: 4px;
+  }
+}

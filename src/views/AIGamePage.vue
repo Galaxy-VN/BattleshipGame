@@ -42,6 +42,7 @@
           :placed-ships="placedShips"
           @ship-selected="handleShipSelected"
           @rotate-ship="handleRotateShip"
+          @set-horizontal="handleSetHorizontal"
           @clear-ships="handleClearShips"
         />
         
@@ -395,6 +396,15 @@ export default {
     
     handleRotateShip() {
       this.isHorizontal = !this.isHorizontal
+      this.showMessage(
+        `Hướng đặt tàu: ${this.isHorizontal ? 'Ngang' : 'Dọc'}`,
+        'info',
+        1500
+      )
+    },
+    
+    handleSetHorizontal(value) {
+      this.isHorizontal = value
       this.showMessage(
         `Hướng đặt tàu: ${this.isHorizontal ? 'Ngang' : 'Dọc'}`,
         'info',

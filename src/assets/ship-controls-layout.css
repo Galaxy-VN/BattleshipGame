@@ -1,0 +1,345 @@
+/* Enhanced ShipControls Layout CSS */
+
+/* Ship Selection Grid */
+.ships-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 8px;
+}
+
+.ship-selection-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+  border: 2px solid rgba(2, 119, 189, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ship-selection-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(2, 119, 189, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.ship-selection-card:hover::before {
+  left: 100%;
+}
+
+.ship-selection-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(2, 119, 189, 0.25);
+  border-color: rgba(2, 119, 189, 0.4);
+}
+
+.ship-selection-card.selected {
+  background: linear-gradient(135deg, rgba(2, 119, 189, 0.15) 0%, rgba(2, 119, 189, 0.1) 100%);
+  border-color: #0277BD;
+  box-shadow: 0 6px 20px rgba(2, 119, 189, 0.3);
+  transform: translateY(-2px);
+}
+
+.ship-selection-card.selected::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  background: #0277BD;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ship-selection-card.selected::after {
+  content: '✓';
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.ship-selection-card.disabled {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%);
+  border-color: rgba(76, 175, 80, 0.3);
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.ship-selection-card.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Ship Card Content */
+.ship-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.ship-name-display {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #263238;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.ship-size-badge {
+  background: linear-gradient(135deg, #FF6F00, #FF8F00);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-width: 32px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(255, 111, 0, 0.3);
+}
+
+.ship-visual-preview {
+  display: flex;
+  gap: 3px;
+  margin: 12px 0;
+  justify-content: center;
+}
+
+.ship-segment {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #546E7A, #607D8B);
+  border: 2px solid #78909C;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.ship-segment::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: #90A4AE;
+  border-radius: 50%;
+}
+
+.ship-selection-card:hover .ship-segment {
+  background: linear-gradient(135deg, #0277BD, #03A9F4);
+  border-color: #0288D1;
+  transform: scale(1.1);
+}
+
+.ship-selection-card.selected .ship-segment {
+  background: linear-gradient(135deg, #0277BD, #03A9F4);
+  border-color: #0288D1;
+  animation: selectedShipPulse 2s ease-in-out infinite;
+}
+
+.ship-selection-card.disabled .ship-segment {
+  background: linear-gradient(135deg, #4CAF50, #66BB6A);
+  border-color: #81C784;
+}
+
+@keyframes selectedShipPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.ship-count-display {
+  text-align: center;
+  margin: 8px 0;
+}
+
+.ship-status-text {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-selected {
+  color: #0277BD;
+  font-weight: 600;
+}
+
+.status-completed {
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+.status-available {
+  color: #757575;
+}
+
+/* Control Actions Section */
+.control-actions-section {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid rgba(2, 119, 189, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.orientation-control {
+  margin-bottom: 20px;
+}
+
+.orientation-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #263238;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.orientation-toggle-group {
+  display: flex;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  padding: 4px;
+  border: 1px solid rgba(2, 119, 189, 0.2);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.orientation-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #757575;
+}
+
+.orientation-btn:hover {
+  background: rgba(2, 119, 189, 0.1);
+  color: #0277BD;
+}
+
+.orientation-btn.active {
+  background: linear-gradient(135deg, #0277BD, #03A9F4);
+  color: white;
+  box-shadow: 0 3px 8px rgba(2, 119, 189, 0.3);
+  font-weight: 600;
+}
+
+.orientation-btn.active .v-icon {
+  color: white;
+}
+
+/* Action Buttons */
+.action-buttons-group {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.action-btn {
+  min-width: 140px;
+  height: 48px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.rotate-btn {
+  background: linear-gradient(135deg, #0277BD, #03A9F4) !important;
+}
+
+.rotate-btn:hover {
+  background: linear-gradient(135deg, #01579B, #0277BD) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(2, 119, 189, 0.4);
+}
+
+.clear-btn {
+  background: linear-gradient(135deg, #D32F2F, #F44336) !important;
+}
+
+.clear-btn:hover {
+  background: linear-gradient(135deg, #B71C1C, #D32F2F) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(211, 47, 47, 0.4);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .ships-selection-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .ship-selection-card {
+    min-height: 120px;
+    padding: 16px;
+  }
+  
+  .ship-name-display {
+    font-size: 1rem;
+  }
+  
+  .ship-segment {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .action-buttons-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .action-btn {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .orientation-toggle-group {
+    margin: 0 auto;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .control-actions-section {
+    padding: 16px;
+  }
+  
+  .ship-selection-card {
+    min-height: 100px;
+    padding: 12px;
+  }
+  
+  .ship-segment {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .ship-size-badge {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+}
