@@ -211,75 +211,98 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         
         <!-- Legend Section -->
-        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6">
+        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 group">
           <div class="flex items-center gap-3 mb-6">
-            <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <span class="text-white font-bold text-sm">🎨</span>
+            <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <span class="text-white font-bold text-lg">🎨</span>
             </div>
-            <h3 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+            <h3 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
               Chú Giải Màu Sắc
             </h3>
           </div>
-          
-          <div class="space-y-4">
-            <div 
-              v-for="item in legendItems" 
-              :key="item.label" 
-              class="flex items-center gap-4 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
+
+          <div class="grid grid-cols-1 gap-4">
+            <div
+              v-for="(item, index) in enhancedLegendItems"
+              :key="item.label"
+              class="legend-item flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:from-white hover:to-gray-50 transition-all duration-300 transform hover:scale-105 hover:shadow-md border border-gray-200 hover:border-gray-300"
+              :style="{ animationDelay: `${index * 100}ms` }"
             >
-              <div 
-                class="w-6 h-6 rounded-lg border-2 border-white shadow-md"
-                :style="{ backgroundColor: item.color }"
-              ></div>
-              <span class="font-medium text-gray-700">{{ item.label }}</span>
+              <div class="legend-icon-wrapper relative">
+                <div
+                  class="w-8 h-8 rounded-xl border-3 border-white shadow-lg transition-all duration-300 hover:scale-110"
+                  :style="{ backgroundColor: item.color }"
+                ></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <span class="text-lg">{{ item.icon }}</span>
+                </div>
+              </div>
+              <div class="flex-1">
+                <span class="font-semibold text-gray-800 text-base">{{ item.label }}</span>
+                <p class="text-sm text-gray-600 mt-1">{{ item.description }}</p>
+              </div>
             </div>
           </div>
         </div>
         
         <!-- Hotkey Guide Section -->
-        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6">
+        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 group">
           <div class="flex items-center gap-3 mb-6">
-            <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg flex items-center justify-center">
-              <span class="text-white font-bold text-sm">⌨️</span>
+            <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <span class="text-white font-bold text-lg">⌨️</span>
             </div>
-            <h3 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">
+            <h3 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">
               Phím Tắt
             </h3>
           </div>
-          
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 class="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">Điều Khiển Tàu:</h4>
-              <div class="space-y-2">
-                <div class="flex items-center gap-3">
-                  <kbd class="px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-xs font-bold shadow-md">R</kbd>
-                  <span class="text-sm text-gray-600">Xoay tàu</span>
+            <div class="hotkey-section">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                  <span class="text-white text-xs">🚢</span>
                 </div>
-                <div class="flex items-center gap-3">
-                  <kbd class="px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-xs font-bold shadow-md">Space</kbd>
-                  <span class="text-sm text-gray-600">Đặt tàu</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <kbd class="px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-xs font-bold shadow-md">Del</kbd>
-                  <span class="text-sm text-gray-600">Xóa tàu</span>
+                <h4 class="font-bold text-gray-800 text-base uppercase tracking-wide">Điều Khiển Tàu</h4>
+              </div>
+              <div class="space-y-3">
+                <div
+                  v-for="(shortcut, index) in shipShortcuts"
+                  :key="shortcut.key"
+                  class="hotkey-item flex items-center gap-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl hover:from-blue-100 hover:to-purple-100 transition-all duration-300 transform hover:scale-105 border border-blue-200 hover:border-blue-300"
+                  :style="{ animationDelay: `${index * 100}ms` }"
+                >
+                  <kbd class="hotkey-badge px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 min-w-[60px] text-center">
+                    {{ shortcut.key }}
+                  </kbd>
+                  <div class="flex-1">
+                    <span class="font-semibold text-gray-800">{{ shortcut.action }}</span>
+                    <p class="text-xs text-gray-600 mt-1">{{ shortcut.description }}</p>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <div>
-              <h4 class="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">Bắn Đối Thủ:</h4>
-              <div class="space-y-2">
-                <div class="flex items-center gap-3">
-                  <kbd class="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-xs font-bold shadow-md">H</kbd>
-                  <span class="text-sm text-gray-600">Trúng</span>
+
+            <div class="hotkey-section">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-6 h-6 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg flex items-center justify-center">
+                  <span class="text-white text-xs">🎯</span>
                 </div>
-                <div class="flex items-center gap-3">
-                  <kbd class="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-xs font-bold shadow-md">M</kbd>
-                  <span class="text-sm text-gray-600">Trượt</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <kbd class="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-xs font-bold shadow-md">C</kbd>
-                  <span class="text-sm text-gray-600">Xóa đánh dấu</span>
+                <h4 class="font-bold text-gray-800 text-base uppercase tracking-wide">Bắn Đối Thủ</h4>
+              </div>
+              <div class="space-y-3">
+                <div
+                  v-for="(shortcut, index) in attackShortcuts"
+                  :key="shortcut.key"
+                  class="hotkey-item flex items-center gap-4 p-3 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl hover:from-red-100 hover:to-pink-100 transition-all duration-300 transform hover:scale-105 border border-red-200 hover:border-red-300"
+                  :style="{ animationDelay: `${(index + 3) * 100}ms` }"
+                >
+                  <kbd class="hotkey-badge px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 min-w-[60px] text-center">
+                    {{ shortcut.key }}
+                  </kbd>
+                  <div class="flex-1">
+                    <span class="font-semibold text-gray-800">{{ shortcut.action }}</span>
+                    <p class="text-xs text-gray-600 mt-1">{{ shortcut.description }}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -289,24 +312,45 @@
     </div>
 
     <!-- Notification Container -->
-    <div class="fixed top-20 right-4 w-full max-w-sm z-50 space-y-2">
-      <div
-        v-for="notification in notifications"
-        :key="notification.id"
-        class="transform transition-all duration-300 ease-in-out"
+    <div class="fixed top-20 right-4 w-full max-w-sm z-50 space-y-3">
+      <transition-group
+        name="notification"
+        tag="div"
+        class="space-y-3"
+        @enter="onNotificationEnter"
+        @leave="onNotificationLeave"
       >
-        <v-alert
-          :type="notification.type"
-          :color="notification.color"
-          :icon="getIconForType(notification.type)"
-          closable
-          :model-value="true"
-          @update:modelValue="removeNotification(notification.id)"
-          class="shadow-lg backdrop-blur-sm"
+        <div
+          v-for="(notification, index) in notifications"
+          :key="notification.id"
+          :data-index="index"
+          class="notification-item transform transition-all duration-500 ease-out"
+          :style="{
+            transitionDelay: `${index * 100}ms`,
+            zIndex: 1000 - index
+          }"
         >
-          {{ notification.text }}
-        </v-alert>
-      </div>
+          <v-alert
+            :type="notification.type"
+            :color="notification.color"
+            :icon="getIconForType(notification.type)"
+            closable
+            :model-value="true"
+            @update:modelValue="removeNotification(notification.id)"
+            class="shadow-xl backdrop-blur-md border border-white/20 rounded-xl overflow-hidden"
+            :class="getNotificationClasses(notification.type)"
+          >
+            <div class="flex items-center gap-3">
+              <div class="notification-icon-wrapper">
+                <span class="notification-icon text-lg">{{ getEmojiForType(notification.type) }}</span>
+              </div>
+              <div class="flex-1">
+                <span class="font-medium">{{ notification.text }}</span>
+              </div>
+            </div>
+          </v-alert>
+        </div>
+      </transition-group>
     </div>
   </div>
 </template>
@@ -340,6 +384,66 @@ export default {
         { label: 'Tàu chiến', color: 'var(--primary-500)' },
         { label: 'Trúng', color: '#e11d48' },
         { label: 'Bắn trượt', color: 'var(--neutral-400)' }
+      ],
+      enhancedLegendItems: [
+        {
+          label: 'Tàu Chiến',
+          color: '#3b82f6',
+          icon: '⚓',
+          description: 'Vị trí đặt tàu của bạn'
+        },
+        {
+          label: 'Tàu Bị Trúng',
+          color: '#f59e0b',
+          icon: '🔥',
+          description: 'Tàu của bạn bị đối thủ bắn trúng'
+        },
+        {
+          label: 'Bắn Trúng',
+          color: '#ef4444',
+          icon: '💥',
+          description: 'Bạn bắn trúng tàu đối thủ'
+        },
+        {
+          label: 'Bắn Trượt',
+          color: '#6b7280',
+          icon: '💧',
+          description: 'Bắn trượt, không có tàu'
+        }
+      ],
+      shipShortcuts: [
+        {
+          key: 'R',
+          action: 'Xoay Tàu',
+          description: 'Chuyển đổi hướng ngang/dọc'
+        },
+        {
+          key: 'Space',
+          action: 'Đặt Tàu',
+          description: 'Đặt tàu đã chọn vào vị trí'
+        },
+        {
+          key: 'Del',
+          action: 'Xóa Tàu',
+          description: 'Xóa tàu tại vị trí hiện tại'
+        }
+      ],
+      attackShortcuts: [
+        {
+          key: 'H',
+          action: 'Đánh Dấu Trúng',
+          description: 'Đánh dấu bắn trúng tàu đối thủ'
+        },
+        {
+          key: 'M',
+          action: 'Đánh Dấu Trượt',
+          description: 'Đánh dấu bắn trượt'
+        },
+        {
+          key: 'C',
+          action: 'Xóa Đánh Dấu',
+          description: 'Xóa tất cả đánh dấu'
+        }
       ],
       notifications: []
     }
@@ -379,9 +483,60 @@ export default {
         case 'success': return 'mdi-check-circle'
         case 'error': return 'mdi-alert-circle'
         case 'warning': return 'mdi-alert'
-        case 'info': 
+        case 'info':
         default: return 'mdi-information'
       }
+    },
+
+    getEmojiForType(type) {
+      switch (type) {
+        case 'success': return '✅'
+        case 'error': return '❌'
+        case 'warning': return '⚠️'
+        case 'info':
+        default: return 'ℹ️'
+      }
+    },
+
+    getNotificationClasses(type) {
+      const baseClasses = 'notification-alert'
+      switch (type) {
+        case 'success':
+          return `${baseClasses} notification-success`
+        case 'error':
+          return `${baseClasses} notification-error`
+        case 'warning':
+          return `${baseClasses} notification-warning`
+        case 'info':
+        default:
+          return `${baseClasses} notification-info`
+      }
+    },
+
+    onNotificationEnter(el, done) {
+      const index = parseInt(el.dataset.index)
+
+      // Set initial state
+      el.style.transform = 'translateX(100%) scale(0.8)'
+      el.style.opacity = '0'
+
+      // Animate in with stagger delay
+      setTimeout(() => {
+        el.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
+        el.style.transform = 'translateX(0) scale(1)'
+        el.style.opacity = '1'
+
+        setTimeout(done, 600)
+      }, index * 150)
+    },
+
+    onNotificationLeave(el, done) {
+      // Animate out to the right (opposite of entry direction)
+      el.style.transition = 'all 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53)'
+      el.style.transform = 'translateX(100%) scale(0.8)'
+      el.style.opacity = '0'
+
+      setTimeout(done, 400)
     },
     handleShipSelected(ship) {
       this.selectedShipSize = ship.size
@@ -432,24 +587,47 @@ export default {
         }
         return
       }
-      
-      // Regular click behavior for manual cell editing
+
+      // Regular click behavior for manual cell editing - 4-state cycle
       if (cell.ship) {
-        this.removeShip(cell)
+        if (cell.hit) {
+          // Ship + Hit -> Miss
+          this.$refs.myBoard.setCellState(cell.row, cell.col, 'miss')
+          this.showMessage('Đã đánh dấu: Bắn trượt', 'info', 2000)
+        } else {
+          // Ship -> Ship + Hit
+          this.$refs.myBoard.setCellState(cell.row, cell.col, 'my_ship_hit')
+          this.showMessage('Đã đánh dấu: Tàu bị trúng', 'warning', 2000)
+        }
       } else {
-        this.$refs.myBoard.setCellState(cell.row, cell.col, 'ship')
-        this.showMessage('Đã đặt tàu thủ công!', 'success', 2000)
+        if (cell.miss) {
+          // Miss -> Clear
+          this.$refs.myBoard.setCellState(cell.row, cell.col, 'clear')
+          this.showMessage('Đã xóa đánh dấu', 'info', 2000)
+        } else if (cell.hit) {
+          // Hit -> Miss
+          this.$refs.myBoard.setCellState(cell.row, cell.col, 'miss')
+          this.showMessage('Đã đánh dấu: Bắn trượt', 'info', 2000)
+        } else {
+          // Clear -> Ship
+          this.$refs.myBoard.setCellState(cell.row, cell.col, 'ship')
+          this.showMessage('Đã đặt tàu thủ công!', 'success', 2000)
+        }
       }
     },
     
     handleOpponentBoardClick(cell) {
+      // Cycle through states: blank -> hit -> miss -> blank (3-state cycle)
       if (cell.hit) {
+        // Hit -> Miss
         this.$refs.opponentBoard.setCellState(cell.row, cell.col, 'miss')
         this.showMessage('Đã đánh dấu: Bắn trượt', 'info', 2000)
       } else if (cell.miss) {
+        // Miss -> Clear (blank)
         this.$refs.opponentBoard.setCellState(cell.row, cell.col, 'clear')
         this.showMessage('Đã xóa đánh dấu', 'info', 2000)
       } else {
+        // Blank -> Hit
         this.$refs.opponentBoard.setCellState(cell.row, cell.col, 'hit')
         this.showMessage('Đã đánh dấu: Bắn trúng!', 'success', 2000)
       }
@@ -797,5 +975,205 @@ button:focus,
   transition-property: transform, box-shadow, filter;
   transition-duration: 300ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Notification Animations */
+.notification-item {
+  transform-origin: right center;
+}
+
+.notification-enter-active {
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.notification-leave-active {
+  transition: all 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+}
+
+.notification-enter-from {
+  transform: translateX(100%) scale(0.8);
+  opacity: 0;
+}
+
+.notification-leave-to {
+  transform: translateX(100%) scale(0.8);
+  opacity: 0;
+}
+
+.notification-move {
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Enhanced notification styling */
+.notification-alert {
+  position: relative;
+  overflow: hidden;
+}
+
+.notification-alert::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.notification-alert:hover::before {
+  left: 100%;
+}
+
+.notification-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  border-left: 4px solid #34d399 !important;
+}
+
+.notification-error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  border-left: 4px solid #f87171 !important;
+}
+
+.notification-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  border-left: 4px solid #fbbf24 !important;
+}
+
+.notification-info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  border-left: 4px solid #60a5fa !important;
+}
+
+.notification-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.notification-icon {
+  animation: notification-icon-bounce 2s ease-in-out infinite;
+}
+
+@keyframes notification-icon-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-3px);
+  }
+  60% {
+    transform: translateY(-2px);
+  }
+}
+
+/* Stagger animation for multiple notifications */
+.notification-item:nth-child(1) { animation-delay: 0ms; }
+.notification-item:nth-child(2) { animation-delay: 150ms; }
+.notification-item:nth-child(3) { animation-delay: 300ms; }
+.notification-item:nth-child(4) { animation-delay: 450ms; }
+.notification-item:nth-child(5) { animation-delay: 600ms; }
+
+/* Enhanced Legend and Hotkey Sections */
+.legend-item {
+  animation: slideInUp 0.6s ease-out both;
+}
+
+.legend-icon-wrapper {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.legend-item:hover .legend-icon-wrapper {
+  transform: rotate(5deg) scale(1.1);
+}
+
+.hotkey-section {
+  animation: fadeInScale 0.8s ease-out both;
+}
+
+.hotkey-item {
+  animation: slideInUp 0.6s ease-out both;
+  position: relative;
+  overflow: hidden;
+}
+
+.hotkey-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.hotkey-item:hover::before {
+  left: 100%;
+}
+
+.hotkey-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.hotkey-badge::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.hotkey-badge:hover::after {
+  width: 100px;
+  height: 100px;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive improvements for legend and hotkeys */
+@media (max-width: 768px) {
+  .legend-item,
+  .hotkey-item {
+    padding: 0.75rem;
+  }
+
+  .hotkey-badge {
+    min-width: 50px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
 }
 </style>

@@ -71,7 +71,7 @@
               <!-- Cell content icons -->
               <span v-if="cell.ship && !cell.hit" class="text-sm drop-shadow-md">⚓</span>
               <span v-else-if="cell.hit && !cell.ship" class="text-sm animate-bounce">💥</span>
-              <span v-else-if="cell.ship && cell.hit" class="text-sm animate-spin">🔥</span>
+              <span v-else-if="cell.ship && cell.hit" class="text-sm animate-fire-pulse">🔥</span>
               <span v-else-if="cell.miss" class="text-sm opacity-80">💧</span>
             </div>
           </div>
@@ -450,7 +450,28 @@ export default {
   to { transform: rotate(360deg); }
 }
 
+@keyframes fire-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 2px rgba(255, 69, 0, 0.5));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.3) drop-shadow(0 0 6px rgba(255, 69, 0, 0.8));
+  }
+}
+
+@keyframes fire-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-1px); }
+  20%, 40%, 60%, 80% { transform: translateX(1px); }
+}
+
 .animate-spin {
   animation: spin 2s linear infinite;
+}
+
+.animate-fire-pulse {
+  animation: fire-pulse 1.5s ease-in-out infinite, fire-shake 0.3s ease-in-out infinite;
 }
 </style>
