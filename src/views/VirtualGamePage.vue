@@ -1,135 +1,311 @@
 <template>
-  <div class="page game-page">
-    <div class="container">
-      <header>
-        <h1>BẢNG VIRTUAL BATTLESHIP</h1>
-        <p>Bảng theo dõi để chơi với bạn bè bằng cách đối thoại</p>
+  <div class="min-h-screen bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 p-3">
+    <div class="max-w-7xl mx-auto">
+      <!-- Header -->
+      <header class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 mb-6 p-6">
+        <div class="text-center">
+          <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-3 tracking-tight">
+            VIRTUAL BATTLESHIP
+          </h1>
+          <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-4 rounded-full"></div>
+          <p class="text-lg text-gray-600 font-medium max-w-2xl mx-auto">
+            Bảng theo dõi để chơi với bạn bè bằng cách đối thoại
+          </p>
+        </div>
       </header>
 
-      <div class="main-layout">
+      <!-- Main Game Layout -->
+      <div class="grid grid-cols-12 gap-6 items-start">
+
         <!-- Left Sidebar - Ship Controls -->
-        <div class="controls-sidebar">
-          <div class="control-section">
-            <h3>🚢 Đặt Tàu</h3>
-            <div class="orientation-toggle">
-              <button 
-                :class="['orientation-btn', { active: isHorizontal }]"
-                @click="handleSetHorizontal(true)"
-              >
-                ➡️ Ngang
-              </button>
-              <button 
-                :class="['orientation-btn', { active: !isHorizontal }]"
-                @click="handleSetHorizontal(false)"
-              >
-                ⬇️ Dọc
-              </button>
-            </div>
-          </div>
-          
-          <div class="ships-list">
-            <div 
-              v-for="ship in shipTypes" 
-              :key="ship.name"
-              :class="['ship-item-compact', { 
-                'selected': selectedShipName === ship.name,
-                'completed': getPlacedCount(ship) >= ship.count 
-              }]"
-              @click="handleShipSelected(ship)"
-            >
-              <div class="ship-info">
-                <span class="ship-name">{{ ship.name.replace('Tàu ', '') }}</span>
-                <span class="ship-count">{{ getPlacedCount(ship) }}/{{ ship.count }}</span>
+        <div class="col-span-4 xl:col-span-3">
+          <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-4 sticky top-4 flex flex-col min-h-[420px]">
+            
+            <!-- Section Header -->
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+              <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                <span class="text-xl">🚢</span>
               </div>
-              <div class="ship-visual-compact">
+              <h3 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                Đặt Tàu Chiến
+              </h3>
+            </div>
+            
+            <!-- Orientation Toggle -->
+            <div class="mb-6">
+              <label class="block text-sm font-semibold text-gray-700 mb-3">Hướng Đặt Tàu</label>
+              <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
+                <button 
+                  :class="[
+                    'px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2',
+                    isHorizontal 
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105' 
+                      : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                  ]"
+                  @click="handleSetHorizontal(true)"
+                >
+                  <span>➡️</span>
+                  <span>Ngang</span>
+                </button>
+                <button 
+                  :class="[
+                    'px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2',
+                    !isHorizontal 
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105' 
+                      : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                  ]"
+                  @click="handleSetHorizontal(false)"
+                >
+                  <span>⬇️</span>
+                  <span>Dọc</span>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Ships List -->
+            <div class="mb-6">
+              <label class="block text-sm font-semibold text-gray-700 mb-3">Chọn Loại Tàu</label>
+              <div class="space-y-2">
                 <div 
-                  v-for="n in ship.size" 
-                  :key="n" 
-                  class="ship-segment-small"
-                ></div>
+                  v-for="ship in shipTypes" 
+                  :key="ship.name"
+                  :class="[
+                    'p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-md',
+                    selectedShipName === ship.name
+                      ? 'border-blue-400 bg-blue-50 shadow-md ring-2 ring-blue-200'
+                      : getPlacedCount(ship) >= ship.count
+                        ? 'border-green-300 bg-green-50 opacity-75'
+                        : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50'
+                  ]"
+                  @click="handleShipSelected(ship)"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="font-medium text-gray-800 text-sm">{{ ship.name }}</span>
+                    <span class="text-xs font-bold px-2 py-1 rounded-full"
+                          :class="getPlacedCount(ship) >= ship.count ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-600'">
+                      {{ getPlacedCount(ship) }}/{{ ship.count }}
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-center gap-1">
+                    <div 
+                      v-for="n in ship.size" 
+                      :key="n" 
+                      class="w-3 h-3 rounded-sm transition-all duration-200"
+                      :class="getPlacedCount(ship) >= ship.count 
+                        ? 'bg-green-400' 
+                        : selectedShipName === ship.name 
+                          ? 'bg-blue-400' 
+                          : 'bg-gray-300'"
+                    ></div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div class="control-buttons">
-            <button @click="resetGame" class="control-btn reset-btn">
-              🔄 Chơi Lại
-            </button>
-            <button @click="autoPlaceShips" class="control-btn auto-btn">
-              ⚡ Tự Động
-            </button>
-            <button @click="handleClearShips" class="control-btn clear-btn">
-              🗑️ Xóa Tàu
-            </button>
+
+            <!-- Spacer to match right side height -->
+            <div class="flex-1 min-h-[47px]"></div>
+
           </div>
         </div>
 
-        <!-- Right Area - Game Boards -->
-        <div class="game-area">
-          <div class="board-container">
-            <h2>Bảng Của Bạn</h2>
-            <GameBoard
-              ref="myBoard"
-              board-type="my"
-              :grid-size="gridSize"
-              :selected-ship-size="selectedShipSize"
-              :is-horizontal="isHorizontal"
-              :placed-ships="placedShips"
-              @cell-click="handleCellClick"
-              @cell-hover="handleCellHover"
-              @cell-leave="handleCellLeave"
-            />
+        <!-- Game Boards Area -->
+        <div class="col-span-8 xl:col-span-9">
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 min-h-[500px]">
+            
+            <!-- My Board -->
+            <div class="flex flex-col h-full">
+              <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 h-full flex flex-col">
+                <div class="flex items-center justify-center gap-3 mb-4">
+                  <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <span class="text-white font-bold text-lg">⚓</span>
+                  </div>
+                  <h2 class="text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600">
+                    Bảng Của Bạn
+                  </h2>
+                </div>
+                <div class="flex justify-center items-center flex-1">
+                  <GameBoard
+                    ref="myBoard"
+                    board-type="my"
+                    :grid-size="gridSize"
+                    :selected-ship-size="selectedShipSize"
+                    :is-horizontal="isHorizontal"
+                    :placed-ships="placedShips"
+                    @cell-click="handleCellClick"
+                    @cell-hover="handleCellHover"
+                    @cell-leave="handleCellLeave"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <!-- Opponent Board -->
+            <div class="flex flex-col h-full">
+              <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 h-full flex flex-col">
+                <div class="flex items-center justify-center gap-3 mb-4">
+                  <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <span class="text-white font-bold text-lg">🎯</span>
+                  </div>
+                  <h2 class="text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600">
+                    Bảng Đối Thủ
+                  </h2>
+                </div>
+                <div class="flex justify-center items-center flex-1">
+                  <GameBoard
+                    ref="opponentBoard"
+                    board-type="opponent"
+                    :grid-size="gridSize"
+                    @cell-click="handleCellClick"
+                    @cell-hover="handleCellHover"
+                    @cell-leave="handleCellLeave"
+                  />
+                </div>
+              </div>
+            </div>
+
           </div>
-          <div class="board-container">
-            <h2>Bảng Đối Thủ</h2>
-            <GameBoard
-              ref="opponentBoard"
-              board-type="opponent"
-              :grid-size="gridSize"
-              @cell-click="handleCellClick"
-              @cell-hover="handleCellHover"
-              @cell-leave="handleCellLeave"
-            />
+
+          <!-- Action Buttons Section -->
+          <div class="mt-8">
+            <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300">
+              <div class="flex items-center justify-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <span class="text-white font-bold text-xl">⚙️</span>
+                </div>
+                <h3 class="text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                  Điều Khiển Trò Chơi
+                </h3>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <button
+                  class="px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 group"
+                  @click="autoPlaceShips"
+                >
+                  <span class="text-xl group-hover:animate-pulse">⚡</span>
+                  <span class="text-lg">Tự Động Đặt Tàu</span>
+                </button>
+
+                <button
+                  class="px-6 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 group"
+                  @click="handleClearShips"
+                >
+                  <span class="text-xl group-hover:animate-bounce">🗑️</span>
+                  <span class="text-lg">Xóa Tất Cả Tàu</span>
+                </button>
+
+                <button
+                  class="px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 group"
+                  @click="resetGame"
+                >
+                  <span class="text-xl group-hover:animate-spin">🔄</span>
+                  <span class="text-lg">Chơi Lại</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="info-area">
-        <div class="legend">
-          <h3>Chú giải màu:</h3>
-          <div class="legend-item">
-            <span class="legend-color ship"></span> Tàu của bạn
+      <!-- Information and Guide Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+        
+        <!-- Legend Section -->
+        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <span class="text-white font-bold text-sm">🎨</span>
+            </div>
+            <h3 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+              Chú Giải Màu Sắc
+            </h3>
           </div>
-          <div class="legend-item">
-            <span class="legend-color my-ship-hit"></span> Tàu bị bắn trúng
-          </div>
-          <div class="legend-item">
-            <span class="legend-color opponent-hit"></span> Bạn bắn trúng
-          </div>
-          <div class="legend-item">
-            <span class="legend-color miss"></span> Bắn trượt
+          
+          <div class="space-y-4">
+            <div 
+              v-for="item in legendItems" 
+              :key="item.label" 
+              class="flex items-center gap-4 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
+            >
+              <div 
+                class="w-6 h-6 rounded-lg border-2 border-white shadow-md"
+                :style="{ backgroundColor: item.color }"
+              ></div>
+              <span class="font-medium text-gray-700">{{ item.label }}</span>
+            </div>
           </div>
         </div>
+        
+        <!-- Hotkey Guide Section -->
+        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg flex items-center justify-center">
+              <span class="text-white font-bold text-sm">⌨️</span>
+            </div>
+            <h3 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">
+              Phím Tắt
+            </h3>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 class="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">Điều Khiển Tàu:</h4>
+              <div class="space-y-2">
+                <div class="flex items-center gap-3">
+                  <kbd class="px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-xs font-bold shadow-md">R</kbd>
+                  <span class="text-sm text-gray-600">Xoay tàu</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <kbd class="px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-xs font-bold shadow-md">Space</kbd>
+                  <span class="text-sm text-gray-600">Đặt tàu</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <kbd class="px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-xs font-bold shadow-md">Del</kbd>
+                  <span class="text-sm text-gray-600">Xóa tàu</span>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 class="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">Bắn Đối Thủ:</h4>
+              <div class="space-y-2">
+                <div class="flex items-center gap-3">
+                  <kbd class="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-xs font-bold shadow-md">H</kbd>
+                  <span class="text-sm text-gray-600">Trúng</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <kbd class="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-xs font-bold shadow-md">M</kbd>
+                  <span class="text-sm text-gray-600">Trượt</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <kbd class="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-xs font-bold shadow-md">C</kbd>
+                  <span class="text-sm text-gray-600">Xóa đánh dấu</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <div class="hotkey-guide">
-          <h3>Hướng dẫn phím tắt (Di chuột vào ô và bấm):</h3>
-          <div class="guide-columns">
-            <div class="guide-column">
-              <h4>Trên Bảng Của Bạn:</h4>
-              <p><code>1</code> : Đặt/Xóa Tàu</p>
-              <p><code>2</code> : Đánh dấu Tàu bị bắn trúng</p>
-              <p><code>3</code> : Đánh dấu Đối thủ bắn trượt</p>
-              <p><code>0</code> / <code>C</code> : Xóa ô</p>
-              <p><code>R</code> : Xoay hướng đặt tàu</p>
-            </div>
-            <div class="guide-column">
-              <h4>Trên Bảng Đối Thủ:</h4>
-              <p><code>1</code> : Đánh dấu Bắn Trúng</p>
-              <p><code>2</code> : Đánh dấu Bắn Trượt</p>
-              <p><code>0</code> / <code>C</code> : Xóa ô</p>
-            </div>
-          </div>
-        </div>
+    <!-- Notification Container -->
+    <div class="fixed top-20 right-4 w-full max-w-sm z-50 space-y-2">
+      <div
+        v-for="notification in notifications"
+        :key="notification.id"
+        class="transform transition-all duration-300 ease-in-out"
+      >
+        <v-alert
+          :type="notification.type"
+          :color="notification.color"
+          :icon="getIconForType(notification.type)"
+          closable
+          :model-value="true"
+          @update:modelValue="removeNotification(notification.id)"
+          class="shadow-lg backdrop-blur-sm"
+        >
+          {{ notification.text }}
+        </v-alert>
       </div>
     </div>
   </div>
@@ -137,11 +313,13 @@
 
 <script>
 import GameBoard from '../components/GameBoard.vue'
+import { VAlert } from 'vuetify/components'
 
 export default {
   name: 'GamePage',
   components: {
-    GameBoard
+    GameBoard,
+    VAlert
   },
   data() {
     return {
@@ -153,20 +331,19 @@ export default {
       placedShips: [],
       shipTypes: [
         { name: 'Tàu Sân Bay', size: 5, count: 1 },
-        { name: 'Tàu Thiết Giáp Hạm', size: 4, count: 1 },
-        { name: 'Tàu Tuần Dương', size: 3, count: 1 },
+        { name: 'Thiết Giáp Hạm', size: 4, count: 1 },
+        { name: 'Tàu Tuần Dương', size: 3, count: 2 },
         { name: 'Tàu Ngầm', size: 3, count: 1 },
         { name: 'Tàu Khu Trục', size: 2, count: 1 }
       ],
       legendItems: [
-        { label: 'Tàu của bạn', color: 'ship-gray' },
-        { label: 'Tàu bị trúng', color: 'error' },
-        { label: 'Bạn bắn trúng', color: 'success' },
-        { label: 'Bắn trượt', color: 'info' }
-      ]
+        { label: 'Tàu chiến', color: 'var(--primary-500)' },
+        { label: 'Trúng', color: '#e11d48' },
+        { label: 'Bắn trượt', color: 'var(--neutral-400)' }
+      ],
+      notifications: []
     }
   },
-  inject: ['showMessage'],
   mounted() {
     document.addEventListener('keydown', this.handleKeyPress)
   },
@@ -174,6 +351,38 @@ export default {
     document.removeEventListener('keydown', this.handleKeyPress)
   },
   methods: {
+    showMessage(text, color = 'info', timeout = 3000) {
+      const id = Date.now() + Math.random()
+      const newNotification = {
+        id,
+        text,
+        color,
+        type: color,
+        show: true
+      }
+      this.notifications.push(newNotification)
+
+      if (timeout > 0) {
+        setTimeout(() => {
+          this.removeNotification(id)
+        }, timeout)
+      }
+    },
+    removeNotification(id) {
+      const index = this.notifications.findIndex(n => n.id === id)
+      if (index > -1) {
+        this.notifications.splice(index, 1)
+      }
+    },
+    getIconForType(type) {
+      switch (type) {
+        case 'success': return 'mdi-check-circle'
+        case 'error': return 'mdi-alert-circle'
+        case 'warning': return 'mdi-alert'
+        case 'info': 
+        default: return 'mdi-information'
+      }
+    },
     handleShipSelected(ship) {
       this.selectedShipSize = ship.size
       this.selectedShipName = ship.name
@@ -182,18 +391,18 @@ export default {
     handleRotateShip() {
       this.isHorizontal = !this.isHorizontal
       this.showMessage(
-        `Hướng đặt tàu: ${this.isHorizontal ? 'Ngang' : 'Dọc'}`,
-        'info',
-        1500
+        `Đã xoay thành ${this.isHorizontal ? 'ngang' : 'dọc'}!`, 
+        'info', 
+        2000
       )
     },
     
     handleSetHorizontal(value) {
       this.isHorizontal = value
       this.showMessage(
-        `Hướng đặt tàu: ${this.isHorizontal ? 'Ngang' : 'Dọc'}`,
-        'info',
-        1500
+        `Đã chuyển thành ${value ? 'ngang' : 'dọc'}!`, 
+        'info', 
+        2000
       )
     },
     
@@ -218,35 +427,31 @@ export default {
       if (this.selectedShipSize) {
         if (this.canPlaceShip(cell.row, cell.col, this.selectedShipSize, this.isHorizontal)) {
           this.placeShip(cell.row, cell.col, this.selectedShipSize, this.isHorizontal, this.selectedShipName)
+        } else {
+          this.showMessage('Không thể đặt tàu ở vị trí này!', 'warning', 2000)
         }
         return
       }
       
       // Regular click behavior for manual cell editing
       if (cell.ship) {
-        if (cell.hit) {
-          this.$refs.myBoard.setCellState(cell.row, cell.col, 'miss')
-        } else {
-          this.$refs.myBoard.setCellState(cell.row, cell.col, 'my_ship_hit')
-        }
+        this.removeShip(cell)
       } else {
-        if (cell.miss) {
-          this.$refs.myBoard.setCellState(cell.row, cell.col, 'clear')
-        } else if (cell.hit) {
-          this.$refs.myBoard.setCellState(cell.row, cell.col, 'miss')
-        } else {
-          this.$refs.myBoard.setCellState(cell.row, cell.col, 'ship')
-        }
+        this.$refs.myBoard.setCellState(cell.row, cell.col, 'ship')
+        this.showMessage('Đã đặt tàu thủ công!', 'success', 2000)
       }
     },
     
     handleOpponentBoardClick(cell) {
       if (cell.hit) {
         this.$refs.opponentBoard.setCellState(cell.row, cell.col, 'miss')
+        this.showMessage('Đã đánh dấu: Bắn trượt', 'info', 2000)
       } else if (cell.miss) {
         this.$refs.opponentBoard.setCellState(cell.row, cell.col, 'clear')
+        this.showMessage('Đã xóa đánh dấu', 'info', 2000)
       } else {
         this.$refs.opponentBoard.setCellState(cell.row, cell.col, 'hit')
+        this.showMessage('Đã đánh dấu: Bắn trúng!', 'success', 2000)
       }
     },
     
@@ -262,10 +467,10 @@ export default {
     
     handleKeyPress(event) {
       if (!this.hoveredCell) return
-      
+
       const key = event.key.toLowerCase()
       const boardType = this.hoveredCell.boardType || 'my'
-      
+
       // Handle rotation
       if (key === 'r' && boardType === 'my') {
         this.handleRotateShip()
@@ -273,40 +478,32 @@ export default {
       }
       
       if (boardType === 'my') {
+        // My board controls
         switch (key) {
-          case '1':
-            if (this.hoveredCell.ship) {
-              this.removeShip(this.hoveredCell)
-            } else if (this.selectedShipSize) {
-              if (this.canPlaceShip(this.hoveredCell.row, this.hoveredCell.col, this.selectedShipSize, this.isHorizontal)) {
-                this.placeShip(this.hoveredCell.row, this.hoveredCell.col, this.selectedShipSize, this.isHorizontal, this.selectedShipName)
-              }
-            } else {
-              this.$refs.myBoard.setCellState(this.hoveredCell.row, this.hoveredCell.col, 'ship')
+          case ' ':
+            if (this.selectedShipSize) {
+              this.handleMyBoardClick(this.hoveredCell)
             }
             break
-          case '2':
-            this.$refs.myBoard.setCellState(this.hoveredCell.row, this.hoveredCell.col, 'my_ship_hit')
-            break
-          case '3':
-            this.$refs.myBoard.setCellState(this.hoveredCell.row, this.hoveredCell.col, 'miss')
-            break
-          case '0':
-          case 'c':
-            this.$refs.myBoard.setCellState(this.hoveredCell.row, this.hoveredCell.col, 'clear')
+          case 'delete':
+          case 'backspace':
+            this.removeShip(this.hoveredCell)
             break
         }
       } else {
+        // Opponent board controls
         switch (key) {
-          case '1':
+          case 'h':
             this.$refs.opponentBoard.setCellState(this.hoveredCell.row, this.hoveredCell.col, 'hit')
+            this.showMessage('Đã đánh dấu: Bắn trúng!', 'success', 2000)
             break
-          case '2':
+          case 'm':
             this.$refs.opponentBoard.setCellState(this.hoveredCell.row, this.hoveredCell.col, 'miss')
+            this.showMessage('Đã đánh dấu: Bắn trượt', 'info', 2000)
             break
-          case '0':
           case 'c':
             this.$refs.opponentBoard.setCellState(this.hoveredCell.row, this.hoveredCell.col, 'clear')
+            this.showMessage('Đã xóa đánh dấu', 'info', 2000)
             break
         }
       }
@@ -326,10 +523,7 @@ export default {
       const shipType = this.shipTypes.find(type => type.name === name)
       
       if (currentCount >= shipType.count) {
-        this.showMessage(
-          `Bạn đã đặt đủ ${name}! Chỉ được đặt ${shipType.count} tàu loại này.`,
-          'warning'
-        )
+        this.showMessage(`Đã đặt đủ ${name}! (${shipType.count}/${shipType.count})`, 'warning', 2000)
         return
       }
       
@@ -346,9 +540,9 @@ export default {
       
       // Update board display
       for (let i = 0; i < size; i++) {
-        const shipRow = isHorizontal ? row : row + i
-        const shipCol = isHorizontal ? col + i : col
-        this.$refs.myBoard.setCellState(shipRow, shipCol, 'ship')
+        const cellRow = isHorizontal ? row : row + i
+        const cellCol = isHorizontal ? col + i : col
+        this.$refs.myBoard.setCellState(cellRow, cellCol, 'ship')
       }
       
       this.showMessage(`Đã đặt ${name}!`, 'success', 2000)
@@ -374,17 +568,17 @@ export default {
       })
       
       if (shipIndex > -1) {
-        const ship = this.placedShips[shipIndex]
+        const removedShip = this.placedShips[shipIndex]
         this.placedShips.splice(shipIndex, 1)
         
         // Clear ship cells on board
-        for (let i = 0; i < ship.size; i++) {
-          const shipRow = ship.isHorizontal ? ship.row : ship.row + i
-          const shipCol = ship.isHorizontal ? ship.col + i : ship.col
-          this.$refs.myBoard.setCellState(shipRow, shipCol, 'clear')
+        for (let i = 0; i < removedShip.size; i++) {
+          const cellRow = removedShip.isHorizontal ? removedShip.row : removedShip.row + i
+          const cellCol = removedShip.isHorizontal ? removedShip.col + i : removedShip.col
+          this.$refs.myBoard.setCellState(cellRow, cellCol, 'clear')
         }
         
-        this.showMessage(`Đã xóa ${ship.name}!`, 'info', 2000)
+        this.showMessage(`Đã xóa ${removedShip.name}!`, 'info', 2000)
       }
     },
     
@@ -398,9 +592,8 @@ export default {
       for (const shipType of ships) {
         for (let count = 0; count < shipType.count; count++) {
           let placed = false
-          attempts = 0
-          
           while (!placed && attempts < maxAttempts) {
+            attempts++
             const row = Math.floor(Math.random() * this.gridSize) + 1
             const col = Math.floor(Math.random() * this.gridSize) + 1
             const isHorizontal = Math.random() < 0.5
@@ -409,11 +602,10 @@ export default {
               this.placeShip(row, col, shipType.size, isHorizontal, shipType.name)
               placed = true
             }
-            attempts++
           }
           
           if (!placed) {
-            this.showMessage('Không thể đặt tất cả tàu tự động. Hãy thử lại!', 'warning')
+            this.showMessage('Không thể đặt tự động tất cả tàu!', 'error', 3000)
             return
           }
         }
@@ -440,637 +632,20 @@ export default {
 </script>
 
 <style scoped>
-.page {
-  min-height: calc(100vh - var(--nav-height));
-  padding: 20px;
-  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #2d3748;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-header {
-  text-align: center;
-  margin-bottom: 30px;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(20px);
-  padding: 32px 24px;
-  border-radius: 24px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
-  background-size: 200% 100%;
-  animation: gradientShift 3s ease-in-out infinite;
-}
-
-header h1 {
-  color: #1a202c;
-  font-size: 2.8em;
-  margin-bottom: 12px;
-  font-weight: 900;
-  letter-spacing: -0.025em;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  position: relative;
-  text-transform: uppercase;
-}
-
-header h1::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  border-radius: 2px;
-}
-
-header p {
-  color: #ffffff;
-  font-size: 1.15em;
-  opacity: 1;
-  font-weight: 600;
-  margin: 0 auto;
-  max-width: 600px;
-  line-height: 1.6;
-  text-align: center !important;
-  display: block;
-  width: 100%;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-/* Main Layout */
-.main-layout {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-  margin: 20px 0;
-}
-
-/* Controls Sidebar */
-.controls-sidebar {
-  width: 280px;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  position: sticky;
-  top: 20px;
-  height: fit-content;
-}
-
-.control-section h3 {
-  margin: 0 0 16px 0;
-  font-size: 1.2em;
-  font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-align: center;
-}
-
-.orientation-toggle {
-  display: flex;
-  gap: 4px;
-  background: #f8fafc;
-  padding: 4px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  margin-bottom: 20px;
-}
-
-.orientation-btn {
-  flex: 1;
-  background: transparent;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.85em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: #64748b;
-  font-family: inherit;
-  text-align: center;
-}
-
-.orientation-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-  transform: scale(1.02);
-}
-
-/* Compact Ship List */
-.ships-list {
-  margin-bottom: 20px;
-}
-
-.ship-item-compact {
-  background: #ffffff;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.ship-item-compact::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
-.ship-item-compact:hover {
-  background: #f8fafc;
-  border-color: #667eea;
-  transform: translateX(4px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
-}
-
-.ship-item-compact:hover::before {
-  transform: scaleX(1);
-}
-
-.ship-item-compact.selected {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-  border-color: #667eea;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
-  transform: translateX(2px);
-}
-
-.ship-item-compact.selected::before {
-  transform: scaleX(1);
-}
-
-.ship-item-compact.completed {
-  background: linear-gradient(135deg, rgba(81, 207, 102, 0.1) 0%, rgba(64, 192, 87, 0.1) 100%);
-  border-color: #51cf66;
-  opacity: 0.8;
-}
-
-.ship-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.ship-name {
-  font-size: 0.9em;
-  font-weight: 600;
-  color: #374151;
-}
-
-.ship-count {
-  font-size: 0.8em;
-  color: #64748b;
-  font-weight: 500;
-  background: #f1f5f9;
-  padding: 2px 8px;
-  border-radius: 10px;
-}
-
-.ship-visual-compact {
-  display: flex;
-  gap: 2px;
-  justify-content: center;
-}
-
-.ship-segment-small {
-  width: 10px;
-  height: 10px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 2px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.ship-item-compact.completed .ship-segment-small {
-  background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
-}
-
-.ship-item-compact:hover .ship-segment-small {
-  transform: scale(1.1);
-}
-
-/* Control Buttons */
-.control-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.control-btn {
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 0.85em;
-  padding: 10px 16px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  color: white;
-  text-align: center;
-}
-
-.reset-btn {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-}
-
-.reset-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-}
-
-.auto-btn {
-  background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
-  box-shadow: 0 2px 8px rgba(81, 207, 102, 0.3);
-}
-
-.auto-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(81, 207, 102, 0.4);
-}
-
-.clear-btn {
-  background: linear-gradient(135deg, #ffd93d 0%, #ff6b35 100%);
-  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
-}
-
-.clear-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
-}
-
-/* Game Area */
-.game-area {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  gap: 30px;
-  align-items: flex-start;
-}
-
-.board-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  min-width: 0;
-}
-
-.board-container h2 {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 1.4em;
-  margin: 0;
-  text-align: center;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-/* Info Area */
-.info-area {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
-  margin: 40px 0;
-}
-
-.legend,
-.hotkey-guide {
-  background: rgba(255, 255, 255, 0.98);
-  padding: 24px;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.legend h3,
-.hotkey-guide h3 {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 1.2em;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background 0.2s ease;
-}
-
-.legend-item:hover {
-  background: #f8fafc;
-}
-
-.legend-color {
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  border-radius: 8px;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.guide-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
-.guide-column h4 {
-  color: #374151;
-  margin-bottom: 12px;
-  font-size: 1.1em;
-  font-weight: 700;
-}
-
-.guide-column p {
-  margin-bottom: 8px;
-  font-size: 0.9em;
-  font-weight: 500;
-  color: #64748b;
-}
-
-.guide-column code {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 0.85em;
-  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
-}
-
-/* Responsive design */
-@media (max-width: 1024px) {
-  .container {
-    max-width: 100%;
-    padding: 0 15px;
+/* Custom keyframe animations for enhanced UX */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
   }
-  
-  .main-layout {
-    gap: 20px;
-  }
-  
-  .controls-sidebar {
-    width: 260px;
-  }
-  
-  .game-area {
-    gap: 20px;
-  }
-  
-  .info-area {
-    gap: 20px;
-  }
-  
-  header h1 {
-    font-size: 2.2em;
+  50% {
+    transform: scale(1.05);
   }
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 0 15px;
-  }
-  
-  .page {
-    padding: 15px;
-  }
-  
-  .main-layout {
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .controls-sidebar {
-    width: 100%;
-    position: static;
-    order: 2;
-  }
-  
-  .game-area {
-    flex-direction: column;
-    align-items: center;
-    gap: 25px;
-    order: 1;
-  }
-  
-  .board-container {
-    width: 100%;
-    max-width: 480px;
-  }
-  
-  .ships-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-  
-  .ship-item-compact {
-    margin-bottom: 0;
-  }
-  
-  .control-buttons {
-    flex-direction: row;
-    gap: 8px;
-  }
-  
-  .control-btn {
-    flex: 1;
-    font-size: 0.8em;
-    padding: 8px 12px;
-  }
-  
-  header {
-    padding: 16px;
-    margin-bottom: 20px;
-  }
-  
-  header h1 {
-    font-size: 2em;
-  }
-  
-  header p {
-    font-size: 1em;
-  }
-  
-  .info-area {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    margin: 30px 0;
-  }
-  
-  .guide-columns {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  
-  .legend,
-  .hotkey-guide {
-    padding: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .page {
-    padding: 10px;
-  }
-  
-  .container {
-    padding: 0 10px;
-  }
-  
-  .main-layout {
-    gap: 15px;
-  }
-  
-  .controls-sidebar {
-    padding: 16px;
-  }
-  
-  .ships-list {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
-  
-  .control-buttons {
-    flex-direction: column;
-    gap: 6px;
-  }
-  
-  .control-btn {
-    font-size: 0.8em;
-    padding: 8px 12px;
-  }
-  
-  .ship-item-compact {
-    padding: 10px;
-  }
-  
-  .ship-info {
-    margin-bottom: 6px;
-  }
-  
-  .ship-name {
-    font-size: 0.85em;
-  }
-  
-  .ship-count {
-    font-size: 0.75em;
-  }
-  
-  .control-section h3 {
-    font-size: 1.1em;
-  }
-  
-  .orientation-btn {
-    padding: 6px 10px;
-    font-size: 0.8em;
-  }
-  
-  header {
-    padding: 12px;
-    margin-bottom: 15px;
-  }
-  
-  header h1 {
-    font-size: 1.8em;
-  }
-  
-  header p {
-    font-size: 0.9em;
-  }
-  
-  .board-container {
-    max-width: 100%;
-  }
-  
-  .board-container h2 {
-    font-size: 1.2em;
-  }
-  
-  .legend,
-  .hotkey-guide {
-    padding: 16px;
-  }
-  
-  .legend h3,
-  .hotkey-guide h3 {
-    font-size: 1.1em;
-    margin-bottom: 15px;
-  }
-  
-  .guide-column h4 {
-    font-size: 1em;
-  }
-  
-  .guide-column p {
-    font-size: 0.85em;
-  }
-  
-  .legend-item {
-    padding: 6px;
-    margin-bottom: 8px;
-  }
-}
-
-/* Animation keyframes */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -1081,7 +656,7 @@ header p {
 @keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-30px);
+    transform: translateX(-20px);
   }
   to {
     opacity: 1;
@@ -1092,7 +667,7 @@ header p {
 @keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(30px);
+    transform: translateX(20px);
   }
   to {
     opacity: 1;
@@ -1100,89 +675,22 @@ header p {
   }
 }
 
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-/* Apply animations */
-header {
-  animation: fadeInUp 0.8s ease-out;
+/* Apply subtle animations */
+.page {
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .controls-sidebar {
-  animation: slideInLeft 0.6s ease-out 0.2s both;
+  animation: slideInLeft 0.6s ease-out 0.1s both;
 }
 
 .game-area {
-  animation: slideInRight 0.6s ease-out 0.4s both;
+  animation: slideInRight 0.6s ease-out 0.2s both;
 }
 
+/* Pulse animation for selected ships */
 .ship-item-compact.selected {
   animation: pulse 2s infinite;
-}
-
-.control-btn {
-  position: relative;
-  overflow: hidden;
-}
-
-.control-btn::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -200px;
-  width: 200px;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  animation: shimmer 2s infinite;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.control-btn:hover::after {
-  opacity: 1;
-}
-
-/* Enhanced hover effects */
-.ship-item-compact {
-  transform-origin: left center;
-  will-change: transform;
-}
-
-.ship-item-compact:active {
-  transform: translateX(0) scale(0.98);
-}
-
-.control-btn:active {
-  transform: translateY(0) scale(0.98);
 }
 
 /* Smooth scrolling */
@@ -1190,11 +698,104 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Focus styles for accessibility */
-.control-btn:focus,
-.orientation-btn:focus,
-.ship-item-compact:focus {
-  outline: 2px solid #667eea;
+/* Enhanced focus styles for accessibility */
+button:focus,
+.cursor-pointer:focus {
+  outline: 2px solid theme('colors.blue.500');
   outline-offset: 2px;
+}
+
+/* Responsive improvements for game boards */
+@media (max-width: 1280px) {
+  .grid.grid-cols-12 {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .col-span-4,
+  .col-span-8,
+  .xl\:col-span-3,
+  .xl\:col-span-9 {
+    grid-column: span 1;
+  }
+
+  .grid.grid-cols-1.xl\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid.grid-cols-1.xl\:grid-cols-2 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .min-h-\[500px\] {
+    min-height: auto;
+  }
+
+  .p-6 {
+    padding: 1rem;
+  }
+
+  .text-2xl.lg\:text-3xl {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .p-3 {
+    padding: 0.75rem;
+  }
+
+  .gap-6 {
+    gap: 1rem;
+  }
+
+  .rounded-2xl {
+    border-radius: 1rem;
+  }
+
+  .grid.grid-cols-1.sm\:grid-cols-3 {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .px-6.py-4 {
+    padding: 0.75rem 1rem;
+  }
+
+  .text-lg {
+    font-size: 1rem;
+  }
+
+  .text-xl {
+    font-size: 1.125rem;
+  }
+}
+
+/* Enhanced action button animations */
+.group:hover .group-hover\:animate-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.group:hover .group-hover\:animate-bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+.group:hover .group-hover\:animate-spin {
+  animation: spin 2s linear infinite;
+}
+
+/* Custom button hover effects */
+.bg-gradient-to-r:hover {
+  filter: brightness(1.1) saturate(1.1);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: transform, box-shadow, filter;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>

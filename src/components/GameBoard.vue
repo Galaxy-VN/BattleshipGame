@@ -1,59 +1,78 @@
 <template>
   <div 
-    class="gameboard-container bg-white/95 backdrop-blur-md rounded-xl shadow-lg overflow-hidden"
-    :class="[boardType, { disabled }]"
+    :class="[
+      'w-full max-w-full mx-auto bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 overflow-hidden transition-all duration-300',
+      boardType === 'my' ? 'hover:shadow-2xl hover:scale-[1.005]' : 'hover:shadow-xl',
+      { 'opacity-60 cursor-not-allowed': disabled }
+    ]"
   >
-    <div class="p-4">
-      <div class="game-board board-with-coordinates">
+    <div class="p-2">
+      <div class="flex flex-col items-center gap-1 w-full">
         <!-- Grid Labels -->
-        <div class="grid-labels">
-          <div class="corner-label"></div>
-          <div 
-            v-for="col in gridSize" 
-            :key="`col-${col}`" 
-            class="col-label coordinate-col"
+        <div class="grid gap-1 justify-center items-center mb-2"
+             :style="{ gridTemplateColumns: `${labelSize} repeat(${gridSize}, ${labelSize})` }">
+          <div :style="{ width: labelSize, height: labelSize }"></div>
+          <div
+            v-for="col in gridSize"
+            :key="`col-${col}`"
+            class="flex items-center justify-center font-bold text-sm bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-lg border border-blue-200 shadow-sm"
+            :style="{ width: labelSize, height: labelSize }"
           >
             {{ String.fromCharCode(64 + col) }}
           </div>
         </div>
-        
+
         <!-- Game Grid -->
-        <div class="grid-container">
-          <div class="row-labels">
-            <div 
-              v-for="row in gridSize" 
-              :key="`row-${row}`" 
-              class="row-label coordinate-row"
+        <div class="flex gap-1 justify-center items-start">
+          <div class="flex flex-col gap-1">
+            <div
+              v-for="row in gridSize"
+              :key="`row-${row}`"
+              class="flex items-center justify-center font-bold text-sm bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-lg border border-blue-200 shadow-sm"
+              :style="{ width: labelSize, height: labelSize }"
             >
               {{ row }}
             </div>
           </div>
-          
-          <div class="grid">
-            <div 
-              v-for="cell in cells" 
+
+          <div class="grid gap-1 p-2 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-xl shadow-xl"
+               :style="{
+                 gridTemplateColumns: `repeat(${gridSize}, ${cellSize})`,
+                 gridTemplateRows: `repeat(${gridSize}, ${cellSize})`
+               }">
+            <div
+              v-for="cell in cells"
               :key="`${boardType}-${cell.row}-${cell.col}`"
               :class="[
-                'cell',
-                'board-cell',
-                {
-                  'ship': cell.ship,
-                  'hit': cell.hit,
-                  'miss': cell.miss,
-                  'water': !cell.ship && !cell.hit && !cell.miss,
-                  'sunk': cell.sunk,
-                  'highlight': cell.highlight,
-                  'preview': cell.preview,
-                  'invalid-preview': cell.invalidPreview,
-                  'disabled': disabled
-                }
+                'border border-2 rounded-lg cursor-pointer transition-all duration-300 relative flex items-center justify-center backdrop-blur-sm text-sm select-none',
+                // Base styles
+                !cell.ship && !cell.hit && !cell.miss ? 'bg-white/90 border-white/40 hover:bg-blue-100 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 hover:scale-105' : '',
+                // Ship styles
+                cell.ship && !cell.hit ? 'bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400 text-white shadow-lg' : '',
+                // Hit styles
+                cell.hit && !cell.ship ? 'bg-gradient-to-br from-red-500 to-pink-600 border-red-400 text-white shadow-lg animate-pulse' : '',
+                // Ship hit styles
+                cell.ship && cell.hit ? 'bg-gradient-to-br from-orange-500 to-red-600 border-orange-400 text-white shadow-lg animate-pulse' : '',
+                // Miss styles
+                cell.miss ? 'bg-gradient-to-br from-gray-400 to-gray-500 border-gray-300 text-white' : '',
+                // Preview styles
+                cell.preview ? 'bg-gradient-to-br from-green-400/60 to-emerald-500/60 border-green-400 shadow-lg scale-105 ring-2 ring-green-300' : '',
+                cell.invalidPreview ? 'bg-gradient-to-br from-red-400/60 to-red-500/60 border-red-400 shadow-lg scale-105 ring-2 ring-red-300' : '',
+                // Disabled state
+                disabled ? 'cursor-not-allowed opacity-50' : ''
               ]"
               :data-row="cell.row"
               :data-col="cell.col"
+              :style="{ width: cellSize, height: cellSize }"
               @click="handleCellClick(cell)"
               @mouseenter="handleCellHover(cell)"
               @mouseleave="handleCellLeave(cell)"
             >
+              <!-- Cell content icons -->
+              <span v-if="cell.ship && !cell.hit" class="text-sm drop-shadow-md">⚓</span>
+              <span v-else-if="cell.hit && !cell.ship" class="text-sm animate-bounce">💥</span>
+              <span v-else-if="cell.ship && cell.hit" class="text-sm animate-spin">🔥</span>
+              <span v-else-if="cell.miss" class="text-sm opacity-80">💧</span>
             </div>
           </div>
         </div>
@@ -101,6 +120,28 @@ export default {
     return {
       cells: [],
       hoveredCell: null
+    }
+  },
+  computed: {
+    cellSize() {
+      // Responsive cell sizing based on screen size
+      if (typeof window !== 'undefined') {
+        const width = window.innerWidth
+        if (width < 640) return '1.5rem' // sm: 24px
+        if (width < 1024) return '1.75rem' // md: 28px
+        return '2rem' // lg+: 32px
+      }
+      return '2rem'
+    },
+    labelSize() {
+      // Responsive label sizing
+      if (typeof window !== 'undefined') {
+        const width = window.innerWidth
+        if (width < 640) return '1.5rem'
+        if (width < 1024) return '1.75rem'
+        return '2rem'
+      }
+      return '2rem'
     }
   },
   watch: {
@@ -310,7 +351,6 @@ export default {
           break
       }
     },
-    
     resetBoard() {
       this.cells.forEach(cell => {
         cell.ship = false
@@ -348,344 +388,69 @@ export default {
           }
         }
       }
+    },
+
+    handleResize() {
+      // Force reactivity update on resize for responsive sizing
+      this.$forceUpdate()
     }
+  },
+  mounted() {
+    // Add window resize listener for responsive sizing
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeUnmount() {
+    // Clean up resize listener
+    window.removeEventListener('resize', this.handleResize)
   }
 }
 </script>
 
 <style scoped>
-.game-board {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
+/* Enhanced hover effects for interactive cells */
+.cursor-pointer:hover:not(.opacity-50) {
+  transform: translateY(-2px) scale(1.05);
 }
 
-.grid-labels {
-  display: grid;
-  grid-template-columns: 2rem repeat(v-bind(gridSize), 2.5rem);
-  gap: 0.125rem;
-  margin-bottom: 0.5rem;
+/* Tối ưu cho desktop 1920x1080 */
+.cursor-pointer:hover:not(.opacity-50) {
+  transform: translateY(-2px) scale(1.05);
 }
 
-.corner-label {
-  width: 2rem;
-  height: 2rem;
-}
-
-.col-label {
-  width: 2.5rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.875rem;
-  color: var(--primary-700);
-  background: var(--primary-50);
-  border-radius: 0.375rem;
-  border: 1px solid var(--primary-200);
-}
-
-.grid-container {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.row-labels {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.row-label {
-  width: 2rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.875rem;
-  color: var(--primary-700);
-  background: var(--primary-50);
-  border-radius: 0.375rem;
-  border: 1px solid var(--primary-200);
-}
-
+/* Đảm bảo board không quá lớn */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(v-bind(gridSize), 2.5rem);
-  grid-template-rows: repeat(v-bind(gridSize), 2.5rem);
-  gap: 0.125rem;
-  border-radius: 0.75rem;
-  padding: 0.75rem;
-  background: linear-gradient(135deg, #0277BD 0%, #01579B 50%, #004D7A 100%);
-  position: relative;
-  margin-top: 0;
+  max-width: 100%;
 }
 
-.row-labels {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-
-.cell {
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 1px solid var(--neutral-300);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 0.375rem;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.cell:hover:not(.disabled):not(.ship):not(.hit):not(.miss):not(.preview):not(.invalid-preview) {
-  background: linear-gradient(135deg, var(--primary-100) 0%, var(--secondary-100) 100%);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(var(--primary-500-rgb), 0.3);
-  border-color: var(--primary-400);
-}
-
-.cell.ship:hover:not(.disabled) {
-  background: linear-gradient(135deg, #0288D1 0%, #0277BD 100%);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(2, 119, 189, 0.4);
-  border-color: var(--primary-700);
-}
-
-.cell.hit:hover:not(.disabled) {
-  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
-  border-color: #be185d;
-}
-
-.cell.ship.hit:hover:not(.disabled) {
-  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
-  border-color: #ea580c;
-}
-
-.cell.miss:hover:not(.disabled) {
-  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(100, 116, 139, 0.4);
-  border-color: var(--neutral-600);
-}
-
-.cell.ship {
-  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-  border-color: var(--primary-700);
-  color: white;
-}
-
-.cell.ship::after {
-  content: '\2693';
-  font-size: 1.125rem;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-}
-
-.cell.hit {
-  background: linear-gradient(135deg, #e11d48 0%, #be185d 100%);
-  border-color: #9f1239;
-  animation: hitPulse 0.6s ease-out;
-}
-
-.cell.hit::after {
-  content: '💥';
-  font-size: 1.125rem;
-  animation: explosion 0.8s ease-out;
-  color: white;
-  font-weight: bold;
-  text-shadow: 
-    0 0 4px rgba(255, 255, 255, 1),
-    0 0 8px rgba(255, 255, 255, 0.8),
-    0 0 12px rgba(255, 255, 255, 0.6),
-    0 2px 4px rgba(0, 0, 0, 0.3);
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
-}
-
-.cell.ship.hit {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  border-color: #c2410c;
-}
-
-.cell.ship.hit::after {
-  content: '\1F525';
-  font-size: 1.125rem;
-}
-
-.cell.miss {
-  background: linear-gradient(135deg, var(--neutral-400) 0%, var(--neutral-500) 100%);
-  border-color: var(--neutral-600);
-}
-
-.cell.miss::after {
-  content: '\2022';
-  font-size: 1rem;
-  opacity: 0.8;
-  color: var(--neutral-200);
-}
-
-.cell.preview {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(22, 163, 74, 0.3) 100%) !important;
-  border-color: var(--success-500) !important;
-  transform: scale(1.02) !important;
-  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4) !important;
-}
-
-.cell.preview:hover {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.5) 0%, rgba(22, 163, 74, 0.5) 100%) !important;
-  border-color: var(--success-600) !important;
-  transform: translateY(-1px) scale(1.05) !important;
-  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5) !important;
-}
-
-.cell.invalid-preview {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(220, 38, 38, 0.3) 100%) !important;
-  border-color: #ef4444 !important;
-  transform: scale(1.02) !important;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4) !important;
-}
-
-.cell.invalid-preview:hover {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.5) 0%, rgba(220, 38, 38, 0.5) 100%) !important;
-  border-color: #dc2626 !important;
-  transform: translateY(-1px) scale(1.05) !important;
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5) !important;
-}
-
-.cell.highlight {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(245, 158, 11, 0.3) 100%);
-  border-color: #f59e0b;
-  transform: scale(1.02);
-}
-
-.gameboard-container.disabled .cell {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.gameboard-container.disabled .cell:hover {
-  transform: none;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
-  box-shadow: none;
-}
-
+/* Animation for hit effects */
 @keyframes hitPulse {
   0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+  50% { transform: scale(1.1); }
   100% { transform: scale(1); }
 }
 
-@keyframes explosion {
-  0% { transform: scale(0.5) rotate(0deg); opacity: 0; }
-  50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
-  100% { transform: scale(1) rotate(360deg); opacity: 1; }
+.animate-pulse {
+  animation: hitPulse 1s ease-in-out infinite;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(v-bind(gridSize), 2rem);
-    grid-template-rows: repeat(v-bind(gridSize), 2rem);
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-  }
-  
-  .row-labels {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-  
-  .cell {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.25rem;
-  }
-  
-  .cell::after {
-    font-size: 0.875rem;
-  }
-  
-  .col-label,
-  .row-label {
-    width: 2rem;
-    height: 2rem;
-    font-size: 0.75rem;
-    border-radius: 0.25rem;
-  }
-  
-  .grid-labels {
-    grid-template-columns: 1.5rem repeat(v-bind(gridSize), 2rem);
-  }
-  
-  .corner-label {
-    width: 1.5rem;
-  }
-  
-  .row-label {
-    width: 1.5rem;
-  }
+/* Custom animations for special effects */
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+  40%, 43% { transform: translate3d(0,-8px,0); }
+  70% { transform: translate3d(0,-4px,0); }
+  90% { transform: translate3d(0,-2px,0); }
 }
 
-@media (max-width: 480px) {
-  .grid {
-    grid-template-columns: repeat(v-bind(gridSize), 1.75rem);
-    grid-template-rows: repeat(v-bind(gridSize), 1.75rem);
-    padding: 0.375rem;
-    border-radius: 0.375rem;
-  }
+.animate-bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
 
-  .grid::before {
-    border-radius: 0.375rem;
-  }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 
-  .row-labels {
-    padding-top: 0.375rem;
-    padding-bottom: 0.375rem;
-  }
-  
-  .cell {
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 0.25rem;
-  }
-  
-  .cell::after {
-    font-size: 0.75rem;
-  }
-  
-  .col-label,
-  .row-label {
-    width: 1.75rem;
-    height: 1.75rem;
-    font-size: 0.675rem;
-    border-radius: 0.25rem;
-  }
-  
-  .grid-labels {
-    grid-template-columns: 1.25rem repeat(v-bind(gridSize), 1.75rem);
-  }
-  
-  .corner-label {
-    width: 1.25rem;
-  }
-  
-  .row-label {
-    width: 1.25rem;
-  }
+.animate-spin {
+  animation: spin 2s linear infinite;
 }
 </style>

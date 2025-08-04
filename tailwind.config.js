@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./index.html",
+    "./public/**/*.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
@@ -19,6 +20,18 @@ module.exports = {
           800: '#1565c0',
           900: '#0d47a1',
         },
+        ship: {
+          50: '#fafafa',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d4d4d8',
+          400: '#a1a1aa',
+          500: '#71717a',
+          600: '#52525b',
+          700: '#3f3f46',
+          800: '#27272a',
+          900: '#18181b',
+        },
         naval: {
           50: '#eceff1',
           100: '#cfd8dc',
@@ -31,7 +44,11 @@ module.exports = {
           800: '#37474f',
           900: '#263238',
         }
-      }
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Poppins', 'system-ui', 'sans-serif'],
+      },
     },
   },
   plugins: [],
