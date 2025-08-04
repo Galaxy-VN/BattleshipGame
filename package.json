@@ -11,7 +11,7 @@
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "vue": "^3.3.4",
-    "vuetify": "^3.9.0-beta.1"
+    "vuetify": "^3.9.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-eslint": "~5.0.0",
