@@ -119,21 +119,21 @@ export default {
   data() {
     return {
       cells: [],
-      hoveredCell: null
+      hoveredCell: null,
+      windowWidth: typeof window !== 'undefined' ? window.innerWidth : 1024
     }
   },
   computed: {
     cellSize() {
+      this.resizeTrigger; // Depend on resizeTrigger
       // Responsive cell sizing based on screen size
-      if (typeof window !== 'undefined') {
-        const width = window.innerWidth
-        if (width < 640) return '1.5rem' // sm: 24px
-        if (width < 1024) return '1.75rem' // md: 28px
-        return '2rem' // lg+: 32px
-      }
+      const width = this.windowWidth
+      if (width < 640) return '1.5rem'
+      if (width < 1024) return '1.75rem'
       return '2rem'
     },
     labelSize() {
+      this.resizeTrigger; // Depend on resizeTrigger
       // Responsive label sizing
       if (typeof window !== 'undefined') {
         const width = window.innerWidth
@@ -392,7 +392,8 @@ export default {
 
     handleResize() {
       // Force reactivity update on resize for responsive sizing
-      this.$forceUpdate()
+      this.resizeTrigger++
+      this.windowWidth = window.innerWidth
     }
   },
   mounted() {
@@ -408,11 +409,6 @@ export default {
 
 <style scoped>
 /* Enhanced hover effects for interactive cells */
-.cursor-pointer:hover:not(.opacity-50) {
-  transform: translateY(-2px) scale(1.05);
-}
-
-/* Tối ưu cho desktop 1920x1080 */
 .cursor-pointer:hover:not(.opacity-50) {
   transform: translateY(-2px) scale(1.05);
 }
@@ -473,5 +469,19 @@ export default {
 
 .animate-fire-pulse {
   animation: fire-pulse 1.5s ease-in-out infinite, fire-shake 0.3s ease-in-out infinite;
+}
+
+/* Accessibility: Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-bounce,
+  .animate-spin,
+  .animate-fire-pulse {
+    animation: none;
+  }
+  
+  .cursor-pointer:hover:not(.opacity-50) {
+    transform: none;
+  }
 }
 </style>

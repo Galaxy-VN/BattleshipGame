@@ -28,6 +28,13 @@
   50% { background-position: 100% 50%; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .ship-controls-container::before {
+    animation: none;
+    background-position: 50% 50%;
+  }
+}
+
 .ship-controls-container:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 32px rgba(55, 71, 79, 0.5);

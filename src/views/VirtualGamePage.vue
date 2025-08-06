@@ -1056,12 +1056,30 @@ button:focus,
 }
 
 /* Custom button hover effects */
+/* Smooth transitions for interactive elements */
+button,
+[role="button"],
+.cursor-pointer,
+.group,
+.legend-item,
+.hotkey-item,
+.hotkey-badge,
+.theme-toggle-btn {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .bg-gradient-to-r:hover {
   filter: brightness(1.1) saturate(1.1);
 }
 
-/* Smooth transitions for all interactive elements */
-* {
+button,
+[role="button"],
+.theme-toggle-btn,
+.legend-item,
+.hotkey-item,
+.hotkey-badge {
   transition-property: transform, box-shadow, filter;
   transition-duration: 300ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

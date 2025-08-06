@@ -123,6 +123,13 @@
   100% { opacity: 1; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .board-cell.hit,
+  .board-cell.sunk {
+    animation: none;
+  }
+}
+
 /* Coordinate labels */
 .coordinate-row, .coordinate-col {
   display: flex;

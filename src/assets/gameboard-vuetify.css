@@ -78,8 +78,8 @@
 }
 
 .cell.ship {
-  background: var(--v-theme-ship-gray, #607D8B);
-  border-color: var(--v-theme-ship-gray, #607D8B);
+  background: var(--v-theme-ship-steel, #607D8B);
+  border-color: var(--v-theme-ship-steel, #607D8B);
 }
 
 .cell.hit {
