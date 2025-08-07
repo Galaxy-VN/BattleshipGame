@@ -1,17 +1,90 @@
 /* Mobile responsive improvements for Vuetify Battleship Game */
 
-/* Mobile-first approach for navigation */
-@media (max-width: 600px) {
+/* Base mobile styles */
+.v-app-bar .v-btn-toggle {
+  display: none;
+}
+
+.v-app-bar-title {
+  font-size: 1rem;
+}
+
+.v-app-bar {
+  height: 56px;
+}
+
+.v-card {
+  margin-bottom: 12px;
+}
+
+.v-card-title {
+  font-size: 1rem;
+  padding: 8px 12px;
+  line-height: 1.2;
+}
+
+.v-card-text {
+  padding: 8px 12px;
+}
+
+.v-btn {
+  min-width: auto;
+}
+
+.v-snackbar {
+  margin: 8px;
+  max-width: calc(100% - 16px);
+}
+
+.game-status-indicator {
+  top: 64px;
+  right: 8px;
+  left: 8px;
+  text-align: center;
+}
+
+/* Tablet and desktop overrides */
+@media (min-width: 601px) {
   .v-app-bar .v-btn-toggle {
-    display: none !important;
+    display: inline-flex;
   }
-  
+
   .v-app-bar-title {
-    font-size: 1rem !important;
+    font-size: 1.25rem; /* Vuetify default */
   }
-  
+
   .v-app-bar {
-    height: 56px !important;
+    height: 64px; /* Vuetify default */
+  }
+
+  .v-card {
+    margin-bottom: 16px; /* Default margin */
+  }
+
+  .v-card-title {
+    font-size: 1.25rem; /* Default size */
+    padding: 16px;
+    line-height: 1.5;
+  }
+
+  .v-card-text {
+    padding: 16px;
+  }
+
+  .v-btn {
+    min-width: 64px; /* Vuetify default */
+  }
+
+  .v-snackbar {
+    margin: 24px;
+    max-width: 344px; /* Vuetify default */
+  }
+
+  .game-status-indicator {
+    top: 80px;
+    right: 16px;
+    left: auto;
+    text-align: left;
   }
 }
 
@@ -43,27 +116,6 @@
   }
 }
 
-/* Better spacing for mobile cards */
-@media (max-width: 600px) {
-  .v-card {
-    margin-bottom: 12px !important;
-  }
-  
-  .v-card-title {
-    font-size: 1rem !important;
-    padding: 8px 12px !important;
-    line-height: 1.2 !important;
-  }
-  
-  .v-card-text {
-    padding: 8px 12px !important;
-  }
-  
-  .v-btn {
-    min-width: auto !important;
-  }
-}
-
 /* Improve game board visibility on mobile */
 @media (max-width: 480px) {
   .game-board-card {
@@ -86,14 +138,6 @@
   .v-stepper-item {
     flex-direction: row !important;
     align-items: center !important;
-  }
-}
-
-/* Snackbar positioning for mobile */
-@media (max-width: 600px) {
-  .v-snackbar {
-    margin: 8px !important;
-    max-width: calc(100% - 16px) !important;
   }
 }
 
@@ -149,20 +193,9 @@
 /* Game state indicators */
 .game-status-indicator {
   position: fixed;
-  top: 80px;
-  right: 16px;
   z-index: 1000;
   padding: 8px 16px;
   border-radius: 20px;
   font-weight: 500;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-@media (max-width: 600px) {
-  .game-status-indicator {
-    top: 64px;
-    right: 8px;
-    left: 8px;
-    text-align: center;
-  }
 }

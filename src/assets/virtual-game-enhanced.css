@@ -32,7 +32,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0,50 Q25,30 50,50 T100,50 L100,100 L0,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+  background: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path d=%22M0,50 Q25,30 50,50 T100,50 L100,100 L0,100 Z%22 fill=%22rgba(255,255,255,0.1)%22/></svg>');
   background-size: 200px 100px;
   animation: wave-animation 20s infinite linear;
 }
@@ -40,6 +40,12 @@
 @keyframes wave-animation {
   0% { transform: translateX(0); }
   100% { transform: translateX(-200px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page.game-page header::before {
+    animation: none;
+  }
 }
 
 .page.game-page header h1 {

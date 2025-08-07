@@ -117,15 +117,19 @@ export default {
     changePage(page) {
       this.mobileMenuOpen = false
       this.$emit('page-changed', page)
+    },
+    handleClickOutside(e) {
+      if (!this.$el.contains(e.target)) {
+        this.mobileMenuOpen = false
+      }
     }
   },
   mounted() {
     // Close mobile menu when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!this.$el.contains(e.target)) {
-        this.mobileMenuOpen = false
-      }
-    })
+    document.addEventListener('click', this.handleClickOutside)
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', this.handleClickOutside)
   }
 }
 </script>

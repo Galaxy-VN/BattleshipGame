@@ -227,6 +227,22 @@ export default {
   }
 }
 
+/* Accessibility: Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .toast-message {
+    animation: none;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .toast-close:hover {
+    transform: none;
+  }
+
+  .progress-bar {
+    transition: none;
+  }
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .toast-container {

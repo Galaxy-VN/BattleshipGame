@@ -1,7 +1,7 @@
 <template>
-  <div 
+  <div
     :class="[
-      'w-full max-w-full mx-auto bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 overflow-hidden transition-all duration-300',
+      'w-full max-w-full mx-auto bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 dark:border-slate-600/50 overflow-hidden transition-all duration-300',
       boardType === 'my' ? 'hover:shadow-2xl hover:scale-[1.005]' : 'hover:shadow-xl',
       { 'opacity-60 cursor-not-allowed': disabled }
     ]"
@@ -15,7 +15,7 @@
           <div
             v-for="col in gridSize"
             :key="`col-${col}`"
-            class="flex items-center justify-center font-bold text-sm bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-lg border border-blue-200 shadow-sm"
+            class="flex items-center justify-center font-bold text-sm bg-gradient-to-r from-blue-100 to-purple-100 dark:from-slate-700 dark:to-slate-600 text-blue-700 dark:text-slate-200 rounded-lg border border-blue-200 dark:border-slate-500 shadow-sm transition-colors duration-300"
             :style="{ width: labelSize, height: labelSize }"
           >
             {{ String.fromCharCode(64 + col) }}
@@ -24,18 +24,18 @@
 
         <!-- Game Grid -->
         <div class="flex gap-1 justify-center items-start">
-          <div class="flex flex-col gap-1">
+          <div class="flex flex-col gap-1 pt-2">
             <div
               v-for="row in gridSize"
               :key="`row-${row}`"
-              class="flex items-center justify-center font-bold text-sm bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-lg border border-blue-200 shadow-sm"
+              class="flex items-center justify-center font-bold text-sm bg-gradient-to-r from-blue-100 to-purple-100 dark:from-slate-700 dark:to-slate-600 text-blue-700 dark:text-slate-200 rounded-lg border border-blue-200 dark:border-slate-500 shadow-sm transition-colors duration-300"
               :style="{ width: labelSize, height: labelSize }"
             >
               {{ row }}
             </div>
           </div>
 
-          <div class="grid gap-1 p-2 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-xl shadow-xl"
+          <div class="grid gap-1 p-2 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 rounded-xl shadow-xl transition-colors duration-300"
                :style="{
                  gridTemplateColumns: `repeat(${gridSize}, ${cellSize})`,
                  gridTemplateRows: `repeat(${gridSize}, ${cellSize})`
@@ -46,7 +46,7 @@
               :class="[
                 'border border-2 rounded-lg cursor-pointer transition-all duration-300 relative flex items-center justify-center backdrop-blur-sm text-sm select-none',
                 // Base styles
-                !cell.ship && !cell.hit && !cell.miss ? 'bg-white/90 border-white/40 hover:bg-blue-100 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 hover:scale-105' : '',
+                !cell.ship && !cell.hit && !cell.miss ? 'bg-white/90 dark:bg-slate-700/90 border-white/40 dark:border-slate-500/60 hover:bg-blue-100 dark:hover:bg-slate-600 hover:border-blue-300 dark:hover:border-slate-400 hover:shadow-md hover:-translate-y-0.5 hover:scale-105 transition-colors duration-300' : '',
                 // Ship styles
                 cell.ship && !cell.hit ? 'bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400 text-white shadow-lg' : '',
                 // Hit styles
@@ -119,21 +119,21 @@ export default {
   data() {
     return {
       cells: [],
-      hoveredCell: null
+      hoveredCell: null,
+      windowWidth: typeof window !== 'undefined' ? window.innerWidth : 1024
     }
   },
   computed: {
     cellSize() {
+      this.resizeTrigger; // Depend on resizeTrigger
       // Responsive cell sizing based on screen size
-      if (typeof window !== 'undefined') {
-        const width = window.innerWidth
-        if (width < 640) return '1.5rem' // sm: 24px
-        if (width < 1024) return '1.75rem' // md: 28px
-        return '2rem' // lg+: 32px
-      }
+      const width = this.windowWidth
+      if (width < 640) return '1.5rem'
+      if (width < 1024) return '1.75rem'
       return '2rem'
     },
     labelSize() {
+      this.resizeTrigger; // Depend on resizeTrigger
       // Responsive label sizing
       if (typeof window !== 'undefined') {
         const width = window.innerWidth
@@ -392,7 +392,8 @@ export default {
 
     handleResize() {
       // Force reactivity update on resize for responsive sizing
-      this.$forceUpdate()
+      this.resizeTrigger++
+      this.windowWidth = window.innerWidth
     }
   },
   mounted() {
@@ -408,11 +409,6 @@ export default {
 
 <style scoped>
 /* Enhanced hover effects for interactive cells */
-.cursor-pointer:hover:not(.opacity-50) {
-  transform: translateY(-2px) scale(1.05);
-}
-
-/* Tối ưu cho desktop 1920x1080 */
 .cursor-pointer:hover:not(.opacity-50) {
   transform: translateY(-2px) scale(1.05);
 }
@@ -473,5 +469,19 @@ export default {
 
 .animate-fire-pulse {
   animation: fire-pulse 1.5s ease-in-out infinite, fire-shake 0.3s ease-in-out infinite;
+}
+
+/* Accessibility: Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-bounce,
+  .animate-spin,
+  .animate-fire-pulse {
+    animation: none;
+  }
+  
+  .cursor-pointer:hover:not(.opacity-50) {
+    transform: none;
+  }
 }
 </style>

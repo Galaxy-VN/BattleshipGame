@@ -1,14 +1,50 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 p-3">
+  <div
+    class="min-h-screen p-3 transition-all duration-500"
+    :class="isDarkMode
+      ? 'bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950'
+      : 'bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700'"
+  >
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
-      <header class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 mb-6 p-6">
-        <div class="text-center">
-          <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-3 tracking-tight">
+      <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 dark:border-slate-700/50 mb-6 p-6 transition-colors duration-300">
+        <!-- Theme Toggle Button -->
+        <div class="absolute top-4 right-4 z-10">
+          <button
+            @click="toggleTheme"
+            class="theme-toggle-btn p-3 rounded-xl bg-white/80 dark:bg-slate-800/90 backdrop-blur-sm border border-gray-200 dark:border-slate-600 shadow-lg hover:shadow-xl transition-all duration-300 group"
+            :title="isDarkMode ? 'Chuyển sang Light Mode' : 'Chuyển sang Dark Mode'"
+          >
+            <div class="relative w-6 h-6">
+              <!-- Sun Icon -->
+              <svg
+                v-show="!isDarkMode"
+                class="absolute inset-0 w-6 h-6 text-yellow-500 transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-12"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+              </svg>
+
+              <!-- Moon Icon -->
+              <svg
+                v-show="isDarkMode"
+                class="absolute inset-0 w-6 h-6 text-blue-400 transition-all duration-300 transform group-hover:scale-110 group-hover:-rotate-12"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+              </svg>
+            </div>
+          </button>
+        </div>
+
+        <div class="text-center relative">
+          <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 mb-3 tracking-tight">
             VIRTUAL BATTLESHIP
           </h1>
-          <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-4 rounded-full"></div>
-          <p class="text-lg text-gray-600 font-medium max-w-2xl mx-auto">
+          <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 dark:from-blue-400 dark:to-purple-400 mx-auto mb-4 rounded-full"></div>
+          <p class="text-lg text-gray-600 dark:text-gray-100 font-medium max-w-2xl mx-auto transition-colors duration-300">
             Bảng theo dõi để chơi với bạn bè bằng cách đối thoại
           </p>
         </div>
@@ -19,40 +55,40 @@
 
         <!-- Left Sidebar - Ship Controls -->
         <div class="col-span-4 xl:col-span-3">
-          <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-4 sticky top-4 flex flex-col min-h-[420px]">
-            
+          <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 dark:border-slate-700/50 p-4 sticky top-4 flex flex-col min-h-[420px] transition-colors duration-300">
+
             <!-- Section Header -->
-            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-slate-600">
               <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
                 <span class="text-xl">🚢</span>
               </div>
-              <h3 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+              <h3 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
                 Đặt Tàu Chiến
               </h3>
             </div>
-            
+
             <!-- Orientation Toggle -->
             <div class="mb-6">
-              <label class="block text-sm font-semibold text-gray-700 mb-3">Hướng Đặt Tàu</label>
-              <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
-                <button 
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3 transition-colors duration-300">Hướng Đặt Tàu</label>
+              <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl transition-colors duration-300">
+                <button
                   :class="[
                     'px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2',
-                    isHorizontal 
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105' 
-                      : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                    isHorizontal
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
+                      : 'text-gray-600 dark:text-gray-100 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm'
                   ]"
                   @click="handleSetHorizontal(true)"
                 >
                   <span>➡️</span>
                   <span>Ngang</span>
                 </button>
-                <button 
+                <button
                   :class="[
                     'px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2',
-                    !isHorizontal 
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105' 
-                      : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                    !isHorizontal
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
+                      : 'text-gray-600 dark:text-gray-100 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm'
                   ]"
                   @click="handleSetHorizontal(false)"
                 >
@@ -64,38 +100,52 @@
             
             <!-- Ships List -->
             <div class="mb-6">
-              <label class="block text-sm font-semibold text-gray-700 mb-3">Chọn Loại Tàu</label>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3 transition-colors duration-300">Chọn Loại Tàu</label>
               <div class="space-y-2">
-                <div 
-                  v-for="ship in shipTypes" 
+                <div
+                  v-for="ship in shipTypes"
                   :key="ship.name"
                   :class="[
                     'p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-md',
                     selectedShipName === ship.name
-                      ? 'border-blue-400 bg-blue-50 shadow-md ring-2 ring-blue-200'
+                      ? 'border-blue-400 shadow-md ring-2 ring-blue-200 dark:ring-blue-400/50'
                       : getPlacedCount(ship) >= ship.count
-                        ? 'border-green-300 bg-green-50 opacity-75'
-                        : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50'
+                        ? 'border-green-300 dark:border-green-600 opacity-75'
+                        : 'border-gray-200 dark:border-slate-600 hover:border-blue-300 dark:hover:border-blue-500'
                   ]"
+                  :style="{
+                    backgroundColor: selectedShipName === ship.name
+                      ? (isDarkMode ? 'rgba(30, 58, 138, 0.3)' : '#eff6ff')
+                      : getPlacedCount(ship) >= ship.count
+                        ? (isDarkMode ? 'rgba(21, 128, 61, 0.3)' : '#f0fdf4')
+                        : (isDarkMode ? '#1e293b' : '#ffffff')
+                  }"
                   @click="handleShipSelected(ship)"
                 >
                   <div class="flex items-center justify-between mb-2">
-                    <span class="font-medium text-gray-800 text-sm">{{ ship.name }}</span>
-                    <span class="text-xs font-bold px-2 py-1 rounded-full"
-                          :class="getPlacedCount(ship) >= ship.count ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-600'">
+                    <span class="font-medium text-sm transition-colors duration-300"
+                          :style="{
+                            color: selectedShipName === ship.name
+                              ? (isDarkMode ? '#93c5fd' : '#1e40af')
+                              : (isDarkMode ? '#ffffff' : '#1f2937')
+                          }">{{ ship.name }}</span>
+                    <span class="text-xs font-bold px-2 py-1 rounded-full transition-colors duration-300"
+                          :class="getPlacedCount(ship) >= ship.count
+                            ? 'bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200'
+                            : 'bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-300'">
                       {{ getPlacedCount(ship) }}/{{ ship.count }}
                     </span>
                   </div>
                   <div class="flex items-center justify-center gap-1">
-                    <div 
-                      v-for="n in ship.size" 
-                      :key="n" 
+                    <div
+                      v-for="n in ship.size"
+                      :key="n"
                       class="w-3 h-3 rounded-sm transition-all duration-200"
-                      :class="getPlacedCount(ship) >= ship.count 
-                        ? 'bg-green-400' 
-                        : selectedShipName === ship.name 
-                          ? 'bg-blue-400' 
-                          : 'bg-gray-300'"
+                      :class="getPlacedCount(ship) >= ship.count
+                        ? 'bg-green-400 dark:bg-green-500'
+                        : selectedShipName === ship.name
+                          ? 'bg-blue-400 dark:bg-blue-500'
+                          : 'bg-gray-300 dark:bg-slate-600'"
                     ></div>
                   </div>
                 </div>
@@ -114,12 +164,12 @@
             
             <!-- My Board -->
             <div class="flex flex-col h-full">
-              <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 h-full flex flex-col">
+              <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 dark:border-slate-700/50 p-6 h-full flex flex-col transition-colors duration-300">
                 <div class="flex items-center justify-center gap-3 mb-4">
                   <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
                     <span class="text-white font-bold text-lg">⚓</span>
                   </div>
-                  <h2 class="text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600">
+                  <h2 class="text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400">
                     Bảng Của Bạn
                   </h2>
                 </div>
@@ -141,12 +191,12 @@
             
             <!-- Opponent Board -->
             <div class="flex flex-col h-full">
-              <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 h-full flex flex-col">
+              <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 dark:border-slate-700/50 p-6 h-full flex flex-col transition-colors duration-300">
                 <div class="flex items-center justify-center gap-3 mb-4">
                   <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
                     <span class="text-white font-bold text-lg">🎯</span>
                   </div>
-                  <h2 class="text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600">
+                  <h2 class="text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400">
                     Bảng Đối Thủ
                   </h2>
                 </div>
@@ -167,12 +217,12 @@
 
           <!-- Action Buttons Section -->
           <div class="mt-8">
-            <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300">
+            <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 dark:border-slate-700/50 p-6 hover:shadow-2xl transition-all duration-300">
               <div class="flex items-center justify-center gap-3 mb-6">
                 <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
                   <span class="text-white font-bold text-xl">⚙️</span>
                 </div>
-                <h3 class="text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                <h3 class="text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
                   Điều Khiển Trò Chơi
                 </h3>
               </div>
@@ -211,12 +261,12 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         
         <!-- Legend Section -->
-        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 group">
+        <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 dark:border-slate-700/50 p-6 hover:shadow-2xl transition-all duration-300 group">
           <div class="flex items-center gap-3 mb-6">
             <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
               <span class="text-white font-bold text-lg">🎨</span>
             </div>
-            <h3 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+            <h3 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">
               Chú Giải Màu Sắc
             </h3>
           </div>
@@ -225,12 +275,12 @@
             <div
               v-for="(item, index) in enhancedLegendItems"
               :key="item.label"
-              class="legend-item flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:from-white hover:to-gray-50 transition-all duration-300 transform hover:scale-105 hover:shadow-md border border-gray-200 hover:border-gray-300"
+              class="legend-item flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-xl hover:from-white hover:to-gray-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-300 transform hover:scale-105 hover:shadow-md border border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
               :style="{ animationDelay: `${index * 100}ms` }"
             >
               <div class="legend-icon-wrapper relative">
                 <div
-                  class="w-8 h-8 rounded-xl border-3 border-white shadow-lg transition-all duration-300 hover:scale-110"
+                  class="w-8 h-8 rounded-xl border-3 border-white dark:border-gray-300 shadow-lg transition-all duration-300 hover:scale-110"
                   :style="{ backgroundColor: item.color }"
                 ></div>
                 <div class="absolute inset-0 flex items-center justify-center">
@@ -238,20 +288,20 @@
                 </div>
               </div>
               <div class="flex-1">
-                <span class="font-semibold text-gray-800 text-base">{{ item.label }}</span>
-                <p class="text-sm text-gray-600 mt-1">{{ item.description }}</p>
+                <span class="font-semibold text-gray-800 dark:text-gray-100 text-base transition-colors duration-300">{{ item.label }}</span>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors duration-300">{{ item.description }}</p>
               </div>
             </div>
           </div>
         </div>
         
         <!-- Hotkey Guide Section -->
-        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 group">
+        <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 dark:border-slate-700/50 p-6 hover:shadow-2xl transition-all duration-300 group">
           <div class="flex items-center gap-3 mb-6">
             <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
               <span class="text-white font-bold text-lg">⌨️</span>
             </div>
-            <h3 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">
+            <h3 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-400 dark:to-blue-400">
               Phím Tắt
             </h3>
           </div>
@@ -262,21 +312,21 @@
                 <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
                   <span class="text-white text-xs">🚢</span>
                 </div>
-                <h4 class="font-bold text-gray-800 text-base uppercase tracking-wide">Điều Khiển Tàu</h4>
+                <h4 class="font-bold text-gray-800 dark:text-gray-100 text-base uppercase tracking-wide transition-colors duration-300">Điều Khiển Tàu</h4>
               </div>
               <div class="space-y-3">
                 <div
                   v-for="(shortcut, index) in shipShortcuts"
                   :key="shortcut.key"
-                  class="hotkey-item flex items-center gap-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl hover:from-blue-100 hover:to-purple-100 transition-all duration-300 transform hover:scale-105 border border-blue-200 hover:border-blue-300"
+                  class="hotkey-item flex items-center gap-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-800/60 dark:to-slate-700/60 rounded-xl hover:from-blue-100 hover:to-purple-100 dark:hover:from-slate-700/80 dark:hover:to-slate-600/80 transition-all duration-300 transform hover:scale-105 border border-blue-200 dark:border-slate-600 hover:border-blue-300 dark:hover:border-slate-500"
                   :style="{ animationDelay: `${index * 100}ms` }"
                 >
                   <kbd class="hotkey-badge px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 min-w-[60px] text-center">
                     {{ shortcut.key }}
                   </kbd>
                   <div class="flex-1">
-                    <span class="font-semibold text-gray-800">{{ shortcut.action }}</span>
-                    <p class="text-xs text-gray-600 mt-1">{{ shortcut.description }}</p>
+                    <span class="font-semibold text-gray-800 dark:text-gray-100 transition-colors duration-300">{{ shortcut.action }}</span>
+                    <p class="text-xs text-gray-600 dark:text-gray-300 mt-1 transition-colors duration-300">{{ shortcut.description }}</p>
                   </div>
                 </div>
               </div>
@@ -287,21 +337,21 @@
                 <div class="w-6 h-6 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg flex items-center justify-center">
                   <span class="text-white text-xs">🎯</span>
                 </div>
-                <h4 class="font-bold text-gray-800 text-base uppercase tracking-wide">Bắn Đối Thủ</h4>
+                <h4 class="font-bold text-gray-800 dark:text-gray-100 text-base uppercase tracking-wide transition-colors duration-300">Bắn Đối Thủ</h4>
               </div>
               <div class="space-y-3">
                 <div
                   v-for="(shortcut, index) in attackShortcuts"
                   :key="shortcut.key"
-                  class="hotkey-item flex items-center gap-4 p-3 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl hover:from-red-100 hover:to-pink-100 transition-all duration-300 transform hover:scale-105 border border-red-200 hover:border-red-300"
+                  class="hotkey-item flex items-center gap-4 p-3 bg-gradient-to-r from-red-50 to-pink-50 dark:from-slate-800/60 dark:to-slate-700/60 rounded-xl hover:from-red-100 hover:to-pink-100 dark:hover:from-slate-700/80 dark:hover:to-slate-600/80 transition-all duration-300 transform hover:scale-105 border border-red-200 dark:border-slate-600 hover:border-red-300 dark:hover:border-slate-500"
                   :style="{ animationDelay: `${(index + 3) * 100}ms` }"
                 >
                   <kbd class="hotkey-badge px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 min-w-[60px] text-center">
                     {{ shortcut.key }}
                   </kbd>
                   <div class="flex-1">
-                    <span class="font-semibold text-gray-800">{{ shortcut.action }}</span>
-                    <p class="text-xs text-gray-600 mt-1">{{ shortcut.description }}</p>
+                    <span class="font-semibold text-gray-800 dark:text-gray-100 transition-colors duration-300">{{ shortcut.action }}</span>
+                    <p class="text-xs text-gray-600 dark:text-gray-300 mt-1 transition-colors duration-300">{{ shortcut.description }}</p>
                   </div>
                 </div>
               </div>
@@ -373,6 +423,7 @@ export default {
       selectedShipName: '',
       isHorizontal: true,
       placedShips: [],
+      isDarkMode: false,
       shipTypes: [
         { name: 'Tàu Sân Bay', size: 5, count: 1 },
         { name: 'Thiết Giáp Hạm', size: 4, count: 1 },
@@ -450,6 +501,30 @@ export default {
   },
   mounted() {
     document.addEventListener('keydown', this.handleKeyPress)
+
+    // Load saved theme preference
+    const savedTheme = localStorage.getItem('theme')
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      this.isDarkMode = true
+      document.documentElement.classList.add('dark')
+    } else {
+      this.isDarkMode = false
+      document.documentElement.classList.remove('dark')
+    }
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem('theme')) {
+        this.isDarkMode = e.matches
+        if (e.matches) {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+      }
+    })
   },
   beforeUnmount() {
     document.removeEventListener('keydown', this.handleKeyPress)
@@ -799,11 +874,26 @@ export default {
       this.selectedShipSize = null
       this.selectedShipName = ''
       this.isHorizontal = true
-      
+
       this.$refs.myBoard.resetBoard()
       this.$refs.opponentBoard.resetBoard()
-      
+
       this.showMessage('Game đã được reset!', 'info', 2000)
+    },
+
+    toggleTheme() {
+      this.isDarkMode = !this.isDarkMode
+
+      // Apply theme to document root
+      if (this.isDarkMode) {
+        document.documentElement.classList.add('dark')
+        localStorage.setItem('theme', 'dark')
+        this.showMessage('Đã chuyển sang Dark Mode! 🌙', 'info', 2000)
+      } else {
+        document.documentElement.classList.remove('dark')
+        localStorage.setItem('theme', 'light')
+        this.showMessage('Đã chuyển sang Light Mode! ☀️', 'info', 2000)
+      }
     }
   }
 }
@@ -966,12 +1056,30 @@ button:focus,
 }
 
 /* Custom button hover effects */
+/* Smooth transitions for interactive elements */
+button,
+[role="button"],
+.cursor-pointer,
+.group,
+.legend-item,
+.hotkey-item,
+.hotkey-badge,
+.theme-toggle-btn {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .bg-gradient-to-r:hover {
   filter: brightness(1.1) saturate(1.1);
 }
 
-/* Smooth transitions for all interactive elements */
-* {
+button,
+[role="button"],
+.theme-toggle-btn,
+.legend-item,
+.hotkey-item,
+.hotkey-badge {
   transition-property: transform, box-shadow, filter;
   transition-duration: 300ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -1070,6 +1178,20 @@ button:focus,
   60% {
     transform: translateY(-2px);
   }
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.05);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.95);
 }
 
 /* Stagger animation for multiple notifications */
