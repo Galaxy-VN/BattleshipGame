@@ -364,12 +364,19 @@
       </div>
 
       <!-- Game Controls - Only for debug when playing -->
-      <div class="game-controls" v-if="gameState.gameMode === 'playing' && showDebugMode && !gameState.isGameFinished">
-        <button 
-          @click="showAIShips = !showAIShips" 
+      <div class="game-controls" v-if="showDebugMode && !gameState.isGameFinished">
+        <button
+          @click="showAIShips = !showAIShips"
           class="game-btn debug-btn"
+          v-if="gameState.gameMode === 'playing'"
         >
           👁️ {{ showAIShips ? 'Ẩn' : 'Hiện' }} Tàu AI
+        </button>
+        <button
+          @click="testAI"
+          class="game-btn debug-btn"
+        >
+          🧪 Test AI
         </button>
       </div>
 
@@ -382,7 +389,7 @@
             </div>
 
             <h2 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 mb-6">
-              {{ gameState.winner === 'human' ? 'CHIẾN THẮNG!' : 'THẤT BẠI!' }}
+              {{ gameState.winner === 'human' ? 'VICTORY!' : 'DEFEAT!' }}
             </h2>
 
             <div class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-6 mb-6 border border-gray-200 dark:border-slate-600">
@@ -945,6 +952,14 @@ export default {
       return this.selectedDifficulty === 'hard' ? [...baseTips, ...hardModeTips] : baseTips
     }
   },
+  watch: {
+    'gameState.isGameFinished'(isFinished) {
+      if (isFinished) {
+        const soundFile = this.gameState.winner === 'human' ? '/sounds/victory.mp3' : '/sounds/defeat.mp3';
+        this.playSound(soundFile);
+      }
+    }
+  },
   mounted() {
     this.initializeGame()
 
@@ -997,6 +1012,16 @@ export default {
     document.removeEventListener('keydown', this.handleKeyboardShortcuts)
   },
   methods: {
+    playSound(soundFile) {
+      if (!this.soundEnabled) return;
+      try {
+        const audio = new Audio(soundFile);
+        audio.play();
+      } catch (e) {
+        console.error(`Error playing sound: ${soundFile}`, e);
+      }
+    },
+
     async initializeGame() {
       this.isLoading = true
       this.loadingProgress = 0
@@ -1017,6 +1042,13 @@ export default {
 
       this.gameEngine = new GameEngine(this.gridSize)
       this.gameEngine.setAIDifficulty(this.selectedDifficulty)
+
+      // Debug logs
+      console.log('GameEngine created:', this.gameEngine)
+      console.log('AI instance:', this.gameEngine.ai)
+      console.log('AI difficulty:', this.gameEngine.ai.difficulty)
+      console.log('Selected difficulty:', this.selectedDifficulty)
+
       const result = this.gameEngine.startGame()
 
       await new Promise(resolve => setTimeout(resolve, 500))
@@ -1048,10 +1080,13 @@ export default {
     
     changeDifficulty(difficulty) {
       if (this.gameState.isGameStarted) return
-      
+
       this.selectedDifficulty = difficulty
       if (this.gameEngine) {
         this.gameEngine.setAIDifficulty(this.selectedDifficulty)
+        console.log(`AI difficulty set to: ${difficulty}`)
+        console.log(`AI instance:`, this.gameEngine.ai)
+        console.log(`AI difficulty:`, this.gameEngine.ai.difficulty)
         this.showMessage(`Đã chuyển độ khó: ${this.getDifficultyText()}`, 'info')
       }
     },
@@ -1221,6 +1256,12 @@ export default {
           phase: this.getAIGamePhase(),
           pattern: this.getAIHuntPattern()
         }
+
+        // Debug AI state
+        console.log('AI state before move:', aiBefore)
+        console.log('AI difficulty:', this.gameEngine.ai.difficulty)
+        console.log('AI mode:', this.gameEngine.ai.mode)
+        console.log('AI target queue:', this.gameEngine.ai.targetQueue)
 
         const result = await this.gameEngine.aiTurn()
 
@@ -1589,6 +1630,22 @@ export default {
       }
     },
 
+    testAI() {
+      if (!this.gameEngine || !this.gameEngine.ai) {
+        this.showMessage('GameEngine hoặc AI chưa được khởi tạo!', 'error')
+        return
+      }
+
+      // Use the new debug method
+      const debugState = this.gameEngine.ai.debugState()
+
+      // Test getNextMove
+      const testMove = this.gameEngine.ai.getNextMove()
+      console.log('Test move:', testMove)
+
+      this.showMessage(`AI Debug - Mode: ${debugState.mode}, Hits: ${debugState.hitCells.length}, Clusters: ${debugState.hitClusters.length}, Queue: ${debugState.targetQueue.length}`, 'info', 5000)
+    },
+
     toggleFullscreen() {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().then(() => {
@@ -1640,6 +1697,38 @@ export default {
 </script>
 
 <style scoped>
+/* Debug buttons */
+.game-controls {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.game-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.debug-btn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
 /* Custom keyframe animations for enhanced UX */
 @keyframes pulse {
   0%, 100% {

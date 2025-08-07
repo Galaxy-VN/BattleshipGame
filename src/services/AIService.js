@@ -93,9 +93,27 @@ export class AIService {
    * Smart move using hunt & target strategy
    */
   getSmartMove() {
-    // Target mode: continue attacking around last hit
-    if (this.mode === 'target' && this.targetQueue.length > 0) {
-      return this.targetQueue.pop()
+    // Target mode: prioritize directional targeting
+    if (this.mode === 'target') {
+      // First try directional continuation
+      const directionalMove = this.getDirectionalContinuationMove()
+      if (directionalMove) {
+        console.log('AI using directional continuation:', directionalMove)
+        return directionalMove
+      }
+
+      // Then try immediate adjacent targeting
+      if (this.lastHit) {
+        const adjacentMove = this.getImmediateAdjacentMove()
+        if (adjacentMove) {
+          return adjacentMove
+        }
+      }
+
+      // Finally use target queue
+      if (this.targetQueue.length > 0) {
+        return this.getSmartQueueTarget()
+      }
     }
 
     // Hunt mode: find new targets
@@ -110,17 +128,41 @@ export class AIService {
     this.updateGamePhase()
     this.adaptStrategy()
 
-    // Advanced target mode: use multiple sophisticated targeting methods
-    if (this.mode === 'target' && this.targetQueue.length > 0) {
+    // Target mode: prioritize directional targeting
+    if (this.mode === 'target') {
+      // PRIORITY 1: Directional continuation - if we have 2+ hits in a line, continue that direction
+      const directionalMove = this.getDirectionalContinuationMove()
+      if (directionalMove) {
+        console.log('AI using directional continuation (HIGHEST PRIORITY):', directionalMove)
+        return directionalMove
+      }
+
+      // PRIORITY 2: If we have a recent hit, target adjacent cells immediately
+      if (this.lastHit) {
+        const adjacentMove = this.getImmediateAdjacentMove()
+        if (adjacentMove) {
+          console.log('AI using immediate adjacent targeting:', adjacentMove)
+          return adjacentMove
+        }
+      }
+
+      // PRIORITY 3: Use target queue (already contains smart adjacent targets)
+      if (this.targetQueue.length > 0) {
+        const queueMove = this.getSmartQueueTarget()
+        if (queueMove) {
+          console.log('AI using target queue:', queueMove)
+          return queueMove
+        }
+      }
+
+      // PRIORITY 4: Advanced targeting only if simple methods fail
       const advancedTargetMove = this.getAdvancedTargetMove()
       if (advancedTargetMove) {
         return advancedTargetMove
       }
-      // Fallback to queue if advanced targeting fails
-      return this.targetQueue.pop()
     }
 
-    // Advanced hunt mode: use multiple probability layers and machine learning
+    // Hunt mode: use advanced probability-based hunting
     return this.getAdvancedHuntMove()
   }
 
@@ -298,37 +340,305 @@ export class AIService {
    */
   getAdvancedTargetMove() {
     console.log('AI using advanced targeting algorithms')
+    console.log('Current hit cells:', this.hitCells)
+    console.log('Target queue:', this.targetQueue)
 
-    // Priority 1: Strategic ship completion analysis
+    // PRIORITY 0: IMMEDIATE ADJACENT TARGETING - if we have a recent hit, target adjacent cells first
+    if (this.lastHit) {
+      const adjacentMove = this.getImmediateAdjacentMove()
+      if (adjacentMove) {
+        console.log('AI using immediate adjacent targeting (HIGHEST PRIORITY):', adjacentMove)
+        return adjacentMove
+      }
+    }
+
+    // PRIORITY 1: Directional continuation - if we have 2+ hits in a line, continue that direction
+    const directionalMove = this.getDirectionalContinuationMove()
+    if (directionalMove) {
+      console.log('AI using directional continuation:', directionalMove)
+      return directionalMove
+    }
+
+    // PRIORITY 2: Strategic ship completion analysis
     const completionMove = this.getStrategicShipCompletionMove()
     if (completionMove) {
       console.log('AI using strategic ship completion:', completionMove)
       return completionMove
     }
 
-    // Priority 2: Multi-ship cluster analysis
+    // PRIORITY 3: Multi-ship cluster analysis
     const clusterMove = this.getClusterBasedMove()
     if (clusterMove) {
       console.log('AI using cluster analysis:', clusterMove)
       return clusterMove
     }
 
-    // Priority 3: Bayesian ship completion prediction
+    // PRIORITY 4: Bayesian ship completion prediction
     const bayesianMove = this.getBayesianPredictionMove()
     if (bayesianMove) {
       console.log('AI using Bayesian prediction:', bayesianMove)
       return bayesianMove
     }
 
-    // Priority 4: Advanced directional analysis with constraint satisfaction
+    // PRIORITY 5: Advanced directional analysis with constraint satisfaction
     const constraintMove = this.getConstraintSatisfactionMove()
     if (constraintMove) {
       console.log('AI using constraint satisfaction:', constraintMove)
       return constraintMove
     }
 
-    // Priority 5: Enhanced smart targeting (original algorithm)
+    // PRIORITY 6: Enhanced smart targeting (original algorithm)
     return this.getSmartTargetMove()
+  }
+
+  /**
+   * IMMEDIATE ADJACENT TARGETING: Target cells adjacent to the most recent hit
+   * This ensures AI focuses on the immediate area around a fresh hit
+   */
+  getImmediateAdjacentMove() {
+    if (!this.lastHit) return null
+
+    // Check if we have an established direction first
+    const establishedDirection = this.getEstablishedDirection(this.lastHit.row, this.lastHit.col)
+
+    let adjacentCells = [
+      { row: this.lastHit.row - 1, col: this.lastHit.col }, // Up
+      { row: this.lastHit.row + 1, col: this.lastHit.col }, // Down
+      { row: this.lastHit.row, col: this.lastHit.col - 1 }, // Left
+      { row: this.lastHit.row, col: this.lastHit.col + 1 }  // Right
+    ]
+
+    // If we have established direction, only consider cells in that direction
+    if (establishedDirection === 'horizontal') {
+      adjacentCells = adjacentCells.filter(cell => cell.row === this.lastHit.row)
+      console.log('AI: Filtering to horizontal adjacent cells only')
+    } else if (establishedDirection === 'vertical') {
+      adjacentCells = adjacentCells.filter(cell => cell.col === this.lastHit.col)
+      console.log('AI: Filtering to vertical adjacent cells only')
+    }
+
+    // Filter valid, untargeted adjacent cells
+    const validAdjacent = adjacentCells.filter(cell =>
+      this.isValidTarget(cell.row, cell.col) && !this.hasBeenTargeted(cell.row, cell.col)
+    )
+
+    if (validAdjacent.length === 0) return null
+
+    // If we have multiple adjacent options, prioritize based on existing patterns
+    if (validAdjacent.length > 1) {
+      // Check if any adjacent cell would extend an existing line
+      for (const cell of validAdjacent) {
+        const wouldExtendLine = this.wouldExtendExistingLine(cell, this.lastHit)
+        if (wouldExtendLine) {
+          console.log(`AI: Adjacent cell ${cell.row},${cell.col} would extend existing line`)
+          return cell
+        }
+      }
+    }
+
+    // Return the first valid adjacent cell
+    console.log(`AI: Targeting adjacent to last hit ${this.lastHit.row},${this.lastHit.col}`)
+    return validAdjacent[0]
+  }
+
+  /**
+   * Check if targeting a cell would extend an existing line of hits
+   */
+  wouldExtendExistingLine(targetCell, fromHit) {
+    const activeHits = this.getActiveHits()
+
+    // Check horizontal extension: targetCell must be on same row as fromHit
+    if (targetCell.row === fromHit.row) {
+      // Look for other hits on the same row that would form a line
+      const horizontalHits = activeHits.filter(hit =>
+        hit.row === fromHit.row && hit.col !== fromHit.col
+      )
+
+      if (horizontalHits.length >= 1) {
+        // Check if targetCell would extend the line in the right direction
+        const allCols = [fromHit.col, targetCell.col, ...horizontalHits.map(h => h.col)]
+        allCols.sort((a, b) => a - b)
+
+        // Check if targetCell is at either end of the sorted sequence
+        const isAtEnd = targetCell.col === allCols[0] || targetCell.col === allCols[allCols.length - 1]
+        return isAtEnd
+      }
+    }
+
+    // Check vertical extension: targetCell must be on same col as fromHit
+    if (targetCell.col === fromHit.col) {
+      // Look for other hits on the same column that would form a line
+      const verticalHits = activeHits.filter(hit =>
+        hit.col === fromHit.col && hit.row !== fromHit.row
+      )
+
+      if (verticalHits.length >= 1) {
+        // Check if targetCell would extend the line in the right direction
+        const allRows = [fromHit.row, targetCell.row, ...verticalHits.map(h => h.row)]
+        allRows.sort((a, b) => a - b)
+
+        // Check if targetCell is at either end of the sorted sequence
+        const isAtEnd = targetCell.row === allRows[0] || targetCell.row === allRows[allRows.length - 1]
+        return isAtEnd
+      }
+    }
+
+    return false
+  }
+
+  /**
+   * DIRECTIONAL CONTINUATION: When we have 2+ hits in a line, continue that direction
+   * This prevents the AI from wasting shots around when direction is already known
+   */
+  getDirectionalContinuationMove() {
+    const activeHits = this.getActiveHits()
+    if (activeHits.length < 2) return null
+
+    // Find all linear sequences of 2+ hits
+    const sequences = this.findLinearSequences(activeHits)
+
+    for (const sequence of sequences) {
+      if (sequence.length >= 2) {
+        // Determine direction and try to extend the sequence
+        const direction = this.getSequenceDirection(sequence)
+        const extensionMove = this.getSequenceExtension(sequence, direction)
+
+        if (extensionMove && !this.hasBeenTargeted(extensionMove.row, extensionMove.col)) {
+          console.log(`AI found directional continuation: sequence of ${sequence.length} hits, extending ${direction}`)
+          return extensionMove
+        }
+      }
+    }
+
+    return null
+  }
+
+  /**
+   * Find all linear sequences of hits (horizontal or vertical)
+   */
+  findLinearSequences(hits) {
+    const sequences = []
+    const processed = new Set()
+
+    for (const hit of hits) {
+      const hitKey = `${hit.row},${hit.col}`
+      if (processed.has(hitKey)) continue
+
+      // Try to build horizontal sequence
+      const horizontalSeq = this.buildSequence(hit, hits, 'horizontal', processed)
+      if (horizontalSeq.length >= 2) {
+        sequences.push(horizontalSeq)
+      }
+
+      // Try to build vertical sequence
+      const verticalSeq = this.buildSequence(hit, hits, 'vertical', processed)
+      if (verticalSeq.length >= 2) {
+        sequences.push(verticalSeq)
+      }
+    }
+
+    return sequences
+  }
+
+  /**
+   * Build a sequence of hits in a specific direction
+   */
+  buildSequence(startHit, allHits, direction, processed) {
+    const sequence = [startHit]
+    processed.add(`${startHit.row},${startHit.col}`)
+
+    const isHorizontal = direction === 'horizontal'
+
+    // Extend in positive direction
+    let current = startHit
+    let extending = true
+    while (extending) {
+      const nextRow = isHorizontal ? current.row : current.row + 1
+      const nextCol = isHorizontal ? current.col + 1 : current.col
+
+      const nextHit = allHits.find(h => h.row === nextRow && h.col === nextCol)
+      if (!nextHit) {
+        extending = false
+      } else {
+        sequence.push(nextHit)
+        processed.add(`${nextHit.row},${nextHit.col}`)
+        current = nextHit
+      }
+    }
+
+    // Extend in negative direction
+    current = startHit
+    extending = true
+    while (extending) {
+      const prevRow = isHorizontal ? current.row : current.row - 1
+      const prevCol = isHorizontal ? current.col - 1 : current.col
+
+      const prevHit = allHits.find(h => h.row === prevRow && h.col === prevCol)
+      if (!prevHit) {
+        extending = false
+      } else {
+        sequence.unshift(prevHit)
+        processed.add(`${prevHit.row},${prevHit.col}`)
+        current = prevHit
+      }
+    }
+
+    return sequence
+  }
+
+  /**
+   * Get the direction of a sequence
+   */
+  getSequenceDirection(sequence) {
+    if (sequence.length < 2) return null
+
+    const first = sequence[0]
+    const second = sequence[1]
+
+    if (first.row === second.row) return 'horizontal'
+    if (first.col === second.col) return 'vertical'
+    return null
+  }
+
+  /**
+   * Get the best extension point for a sequence
+   */
+  getSequenceExtension(sequence, direction) {
+    if (!direction || sequence.length < 2) return null
+
+    const isHorizontal = direction === 'horizontal'
+    const sorted = [...sequence].sort((a, b) => {
+      return isHorizontal ? a.col - b.col : a.row - b.row
+    })
+
+    const first = sorted[0]
+    const last = sorted[sorted.length - 1]
+
+    // Try to extend at both ends, prioritize the end that's more likely to be valid
+    const extensions = []
+
+    // Extend beyond the last element
+    const extendRow = isHorizontal ? last.row : last.row + 1
+    const extendCol = isHorizontal ? last.col + 1 : last.col
+    if (this.isValidTarget(extendRow, extendCol)) {
+      extensions.push({ row: extendRow, col: extendCol, priority: 1 })
+    }
+
+    // Extend before the first element
+    const prependRow = isHorizontal ? first.row : first.row - 1
+    const prependCol = isHorizontal ? first.col - 1 : first.col
+    if (this.isValidTarget(prependRow, prependCol)) {
+      extensions.push({ row: prependRow, col: prependCol, priority: 1 })
+    }
+
+    // Return the first valid extension
+    for (const ext of extensions) {
+      if (!this.hasBeenTargeted(ext.row, ext.col)) {
+        return { row: ext.row, col: ext.col }
+      }
+    }
+
+    return null
   }
 
   /**
@@ -566,8 +876,8 @@ export class AIService {
         })
       }
 
-      const move = this.targetQueue.pop()
-      console.log('AI using target queue:', move)
+      const move = this.getSmartQueueTarget()
+      console.log('AI using smart target queue:', move)
       return move
     }
 
@@ -1233,6 +1543,7 @@ export class AIService {
    */
   processResult(row, col, isHit, isShipSunk = false, sunkShipCells = null) {
     console.log(`AI processResult: ${row},${col} hit=${isHit} sunk=${isShipSunk} mode=${this.mode} queueLength=${this.targetQueue.length}`)
+    console.log(`AI: Current hit cells before processing:`, this.hitCells)
 
     // Track move in history for advanced analysis
     this.moveHistory.push({ row, col, isHit, timestamp: Date.now() })
@@ -1248,6 +1559,7 @@ export class AIService {
       // If ship sunk info is provided, use it
       if (isShipSunk && sunkShipCells) {
         console.log('AI: Ship sunk, cleaning up targets')
+        console.log('AI: Sunk ship cells:', sunkShipCells)
         this.shipSunk(sunkShipCells)
       } else {
         // Always add adjacent targets when hit (don't auto-detect ship sunk)
@@ -1266,6 +1578,7 @@ export class AIService {
     }
 
     console.log(`AI processResult complete: mode=${this.mode} queueLength=${this.targetQueue.length}`)
+    console.log(`AI: Current hit cells after processing:`, this.hitCells)
   }
 
   /**
@@ -1531,9 +1844,76 @@ export class AIService {
   }
 
   /**
-   * Add adjacent cells to target queue with smart prioritization
+   * Add adjacent cells to target queue with SMART prioritization
+   * ENHANCED: Only add targets that make strategic sense
    */
   addAdjacentTargets(row, col) {
+    console.log(`AI: Adding adjacent targets for hit at ${row},${col}`)
+
+    // Check if we already have a direction established
+    const establishedDirection = this.getEstablishedDirection(row, col)
+    console.log(`AI: Established direction: ${establishedDirection}`)
+
+    if (establishedDirection) {
+      // If we know the direction, only add targets in that direction
+      this.addDirectionalTargets(row, col, establishedDirection)
+    } else {
+      // If no direction established, add all 4 directions but prioritize
+      this.addAllDirectionalTargets(row, col)
+    }
+  }
+
+  /**
+   * Check if we have an established direction for this hit
+   */
+  getEstablishedDirection(row, col) {
+    const activeHits = this.getActiveHits()
+
+    // Check for horizontal alignment
+    const horizontalHits = activeHits.filter(hit =>
+      hit.row === row && Math.abs(hit.col - col) === 1
+    )
+    if (horizontalHits.length > 0) {
+      return 'horizontal'
+    }
+
+    // Check for vertical alignment
+    const verticalHits = activeHits.filter(hit =>
+      hit.col === col && Math.abs(hit.row - row) === 1
+    )
+    if (verticalHits.length > 0) {
+      return 'vertical'
+    }
+
+    return null
+  }
+
+  /**
+   * Add targets only in the established direction
+   */
+  addDirectionalTargets(row, col, direction) {
+    const targets = []
+
+    if (direction === 'horizontal') {
+      targets.push(
+        { row, col: col - 1, priority: 10 },
+        { row, col: col + 1, priority: 10 }
+      )
+    } else if (direction === 'vertical') {
+      targets.push(
+        { row: row - 1, col, priority: 10 },
+        { row: row + 1, col, priority: 10 }
+      )
+    }
+
+    console.log(`AI: Adding ${targets.length} directional targets for ${direction}`)
+    this.addTargetsToQueue(targets)
+  }
+
+  /**
+   * Add all 4 directional targets with priority
+   */
+  addAllDirectionalTargets(row, col) {
     const directions = [
       { row: row - 1, col, priority: this.getDirectionPriority(row - 1, col, 'vertical') }, // Up
       { row: row + 1, col, priority: this.getDirectionPriority(row + 1, col, 'vertical') }, // Down
@@ -1544,7 +1924,15 @@ export class AIService {
     // Sort by priority (higher priority first)
     directions.sort((a, b) => b.priority - a.priority)
 
-    directions.forEach(target => {
+    console.log(`AI: Adding ${directions.length} targets with priorities:`, directions.map(d => d.priority))
+    this.addTargetsToQueue(directions)
+  }
+
+  /**
+   * Helper to add targets to queue with validation
+   */
+  addTargetsToQueue(targets) {
+    targets.forEach(target => {
       if (this.isValidTarget(target.row, target.col)) {
         // Avoid duplicates
         if (!this.targetQueue.some(t => t.row === target.row && t.col === target.col)) {
@@ -1552,6 +1940,22 @@ export class AIService {
         }
       }
     })
+  }
+
+  /**
+   * Smart target selection from queue - prioritizes high-priority targets
+   */
+  getSmartQueueTarget() {
+    if (this.targetQueue.length === 0) return null
+
+    // Sort queue by priority (highest first)
+    this.targetQueue.sort((a, b) => (b.priority || 1) - (a.priority || 1))
+
+    // Take the highest priority target
+    const target = this.targetQueue.shift()
+    console.log(`AI: Selected target from queue with priority ${target.priority || 1}:`, target)
+
+    return target
   }
 
   /**
@@ -1610,6 +2014,8 @@ export class AIService {
 
     if (isAdjacentToSunkShip) {
       console.log(`AI: Skipping ${row},${col} - adjacent to sunk ship (ships can't touch)`)
+      console.log(`AI: Current sunk ships:`, this.sunkShips)
+      console.log(`AI: Current hit cells:`, this.hitCells)
       return false
     }
 
@@ -1630,6 +2036,7 @@ export class AIService {
   shipSunk(shipCells) {
     console.log('AI: Ship sunk with cells:', shipCells)
     console.log(`AI: Before cleanup - queue length: ${this.targetQueue.length}`)
+    console.log(`AI: Current hit cells:`, this.hitCells)
 
     this.sunkShips.push(shipCells)
 
@@ -1658,13 +2065,23 @@ export class AIService {
     // Clean up any remaining hits that are part of this sunk ship
     this.cleanupSunkShipHits(shipCells)
 
-    // If no more targets, switch to hunt mode
-    if (this.targetQueue.length === 0) {
-      console.log('AI: No more targets, switching to hunt mode')
+    // CRITICAL FIX: Check if there are still unsunk hit clusters
+    const remainingHitClusters = this.analyzeRemainingHitClusters()
+    console.log(`AI: Found ${remainingHitClusters.length} remaining hit clusters:`, remainingHitClusters)
+
+    // If we have remaining hit clusters, stay in target mode and rebuild target queue
+    if (remainingHitClusters.length > 0) {
+      console.log('AI: Still have unsunk ships, rebuilding target queue')
+      this.rebuildTargetQueueFromClusters(remainingHitClusters)
+      this.mode = 'target'
+    } else if (this.targetQueue.length === 0) {
+      console.log('AI: No more targets or hit clusters, switching to hunt mode')
       this.mode = 'hunt'
     } else {
       console.log('AI: Still have targets, staying in target mode')
     }
+
+    console.log(`AI: Final state - mode: ${this.mode}, queue length: ${this.targetQueue.length}`)
   }
 
   /**
@@ -1722,6 +2139,89 @@ export class AIService {
       // Find the most recent hit that's not part of a sunk ship
       this.lastHit = this.findMostRecentActiveHit()
     }
+  }
+
+  /**
+   * Analyze remaining hit clusters to find unsunk ships
+   */
+  analyzeRemainingHitClusters() {
+    const clusters = []
+    const processedHits = new Set()
+
+    for (const hit of this.hitCells) {
+      const hitKey = `${hit.row},${hit.col}`
+      if (processedHits.has(hitKey)) continue
+
+      // Find all connected hits (same ship)
+      const cluster = this.findConnectedHits(hit, processedHits)
+      if (cluster.length > 0) {
+        clusters.push(cluster)
+      }
+    }
+
+    return clusters
+  }
+
+  /**
+   * Find all hits connected to a starting hit (same ship)
+   */
+  findConnectedHits(startHit, processedHits) {
+    const cluster = []
+    const toProcess = [startHit]
+
+    while (toProcess.length > 0) {
+      const currentHit = toProcess.pop()
+      const hitKey = `${currentHit.row},${currentHit.col}`
+
+      if (processedHits.has(hitKey)) continue
+
+      processedHits.add(hitKey)
+      cluster.push(currentHit)
+
+      // Find adjacent hits (horizontally or vertically connected)
+      const adjacentHits = this.hitCells.filter(hit => {
+        const hitKey2 = `${hit.row},${hit.col}`
+        if (processedHits.has(hitKey2)) return false
+
+        const rowDiff = Math.abs(hit.row - currentHit.row)
+        const colDiff = Math.abs(hit.col - currentHit.col)
+
+        // Only horizontal or vertical adjacency (not diagonal)
+        return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)
+      })
+
+      toProcess.push(...adjacentHits)
+    }
+
+    return cluster
+  }
+
+  /**
+   * Rebuild target queue from remaining hit clusters
+   */
+  rebuildTargetQueueFromClusters(clusters) {
+    this.targetQueue = []
+
+    for (const cluster of clusters) {
+      // For each cluster, add potential targets to complete the ship
+      for (const hit of cluster) {
+        this.addAdjacentTargets(hit.row, hit.col)
+      }
+    }
+
+    // Remove duplicates and invalid targets
+    this.targetQueue = this.targetQueue.filter((target, index, self) => {
+      // Remove duplicates
+      const isDuplicate = self.findIndex(t => t.row === target.row && t.col === target.col) !== index
+      if (isDuplicate) return false
+
+      // Remove if already targeted
+      if (this.hasBeenTargeted(target.row, target.col)) return false
+
+      return true
+    })
+
+    console.log(`AI: Rebuilt target queue with ${this.targetQueue.length} targets from ${clusters.length} clusters`)
   }
 
   /**
@@ -2213,6 +2713,37 @@ export class AIService {
     }
 
     return hasTargetCell && hasHits
+  }
+
+  /**
+   * Debug method to show current AI state
+   */
+  debugState() {
+    console.log('=== AI DEBUG STATE ===')
+    console.log('Difficulty:', this.difficulty)
+    console.log('Mode:', this.mode)
+    console.log('Game Phase:', this.gamePhase)
+    console.log('Hunt Pattern:', this.currentHuntPattern)
+    console.log('Hit Cells:', this.hitCells)
+    console.log('Target Queue:', this.targetQueue)
+    console.log('Sunk Ships:', this.sunkShips)
+    console.log('Last Hit:', this.lastHit)
+
+    const clusters = this.analyzeRemainingHitClusters()
+    console.log('Hit Clusters:', clusters)
+    console.log('======================')
+
+    return {
+      difficulty: this.difficulty,
+      mode: this.mode,
+      gamePhase: this.gamePhase,
+      huntPattern: this.currentHuntPattern,
+      hitCells: this.hitCells,
+      targetQueue: this.targetQueue,
+      sunkShips: this.sunkShips,
+      lastHit: this.lastHit,
+      hitClusters: clusters
+    }
   }
 
   /**
